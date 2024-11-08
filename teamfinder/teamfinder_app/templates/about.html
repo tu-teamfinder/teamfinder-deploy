@@ -1,0 +1,156 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Team Finder</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: #2a5298;
+            color: #fff;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .container {
+            background: #fff;
+            color: #333;
+            border-radius: 10px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #2a5298;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        p {
+            font-size: 1.3em;
+            color: #555;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        /* Team Section */
+        .teammate {
+            margin-top: 40px;
+        }
+
+        .teammate h3 {
+            font-size: 1.8em;
+            color: #2a5298;
+            margin-bottom: 15px;
+        }
+
+        .teammate ul li {
+            font-size: 1.2em;
+            margin-bottom: 12px;
+            color: #666;
+            transition: color 0.3s ease;
+        }
+
+        .teammate ul li:hover {
+            color: #2a5298;
+            cursor: pointer;
+        }
+
+        /* Project Links */
+        .project-links li {
+            margin: 15px 0;
+        }
+
+        .project-links a {
+            color: #1a73e8;
+            font-size: 1.2em;
+            text-decoration: none;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .project-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: #1a73e8;
+            transition: width 0.3s ease;
+        }
+
+        .project-links a:hover {
+            color: #003366;
+        }
+
+        .project-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                width: 100%;
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+
+            p {
+                font-size: 1.1em;
+            }
+
+            .teammate ul li {
+                font-size: 1em;
+            }
+
+            .project-links a {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Team Finder</h1>
+        <p>"Make Projects Better Together"</p>
+
+        <div class="teammate">
+            <h3>Our Team Members</h3>
+            <ul>
+                <li>6510615062 Chaisiri Onlim</li>
+                <li>6510615112 Teerapat Phosri</li>
+                <li>6510615120 Tanapat Sa-nguantud</li>
+                <li>6510615336 Suteethorn Kavinate</li>
+            </ul>
+        </div>
+
+        <div class="teammate">
+            <h3>Our Project</h3>
+            <ul class="project-links">
+                <li><a href="{% static 'assets/rd.pdf' %}" target="_blank">Requirements Document</a></li>
+                <li><a href="https://trello.com/b/W0IX0pPk/cn331-teamfinder" target="_blank">Trello Board</a></li>
+                <li><a href="https://github.com/6510615120/teamfinder" target="_blank">GitHub Repository</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
