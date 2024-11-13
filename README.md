@@ -27,7 +27,24 @@
 - 🗄️ **Database**: SQLite (default for Django, can be replaced with others)
 - 🧑‍💻 **Version Control**: Git/GitHub
 
+## 🔧 Installation
 
+To get started with this project, follow these steps:
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/6510615120/Team-Finder.git
+```
+
+### 2. Navigate into the project directory
+```bash
+cd Team-Finder
+```
+
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
 
 ## 👥 Team members
 
