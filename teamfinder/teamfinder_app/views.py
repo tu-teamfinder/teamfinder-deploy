@@ -200,12 +200,3 @@ def help(request):
     return render(request, 'help.html')
 
 
-from django.http import JsonResponse
-from teamfinder_app.models import Tag  # Assuming you have a Tag model
-
-def get_tag_suggestions(request):
-    query = request.GET.get('query', '')
-    if query:
-        suggestions = Tag.objects.filter(name__icontains=query).values_list('name', flat=True)[:10]
-        return JsonResponse({'suggestions': list(suggestions)})
-    return JsonResponse({'suggestions': []})

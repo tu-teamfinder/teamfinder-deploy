@@ -80,8 +80,3 @@ class Registration(models.Model):
     request = models.ForeignKey(Request, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
-
-    def __str__(self):
-        return self.name

@@ -10,5 +10,4 @@ urlpatterns = [
     path('myaccount', views.myaccount, name='myaccount'),
 
     path('create', views.create_post, name='create'),
-    path('get-tag-suggestions/', views.get_tag_suggestions, name='get_tag_suggestions'),
 ]
