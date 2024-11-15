@@ -170,6 +170,7 @@ def create_post(request):
         heading = request.POST.get('heading')
         content = request.POST.get('content')
         tag = request.POST.get('tag')
+        status = request.POST.get('status')
         
         post = Post.objects.create(
             user=user,
@@ -178,7 +179,12 @@ def create_post(request):
         )
         post.save()
 
-        
+        recruit = RecruitPost.objects.create(
+            post=post,
+            tag=tag,
+            status=status
+        )
+        recruit.save()
 
         return redirect('/recruitment')
 
