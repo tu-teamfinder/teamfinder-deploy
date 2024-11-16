@@ -6,6 +6,7 @@ import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
 from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Requirement, FeedbackMessage, Registration
 from django.core.exceptions import ObjectDoesNotExist
+from taggit.models import Tag
 
 # Create your views here.
 
@@ -57,9 +58,13 @@ def web_login(request):
                     email_address=data["email"],
                     name=data["displayname_en"],
                     major=data["department"],
+                    faculty=data["fuculty"],
                     year=year
                 )
                 user_profile.save()
+
+                Tag.objects.get_or_create(name=data["department"])
+                Tag.objects.get_or_create(name=data["faculty"])
 
                 create_user = authmodel.User.objects.create_user(
                     username = username,
