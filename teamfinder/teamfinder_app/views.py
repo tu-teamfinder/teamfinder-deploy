@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
-from teamfinder_app.models import User, Post, RecruitPost, ResultPost, FeedbackMessage, Registration
+from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team
 from django.core.exceptions import ObjectDoesNotExist
+
 
 # Create your views here.
 
@@ -86,17 +87,17 @@ def web_login(request):
 def myaccount(request):
     user = User.objects.get(user_id=get_user(request))
     created_post = RecruitPost.objects.filter(post__user=user)
-    current_teams = Registration.objects.filter(user=user)
-    outcome = ResultPost.objects.filter(post__user=user)
-    feedback = FeedbackMessage.objects.filter(receiver=user)
-    # ต้องเอา created_post ใส่ด้วย ^
-
+    current_joinedteams = TeamMember.objects.filter(member=user)
+    current_leadteams = Team.objects.filter(team_leader=user)
+    resultpost = ResultPost.objects.filter(post__user=user)
+    feedback = Feedback.objects.filter(receiver=user)
     context = {
         "user_id": user.user_id,
         "userdata": user,
         "created_post": created_post,
-        "current_teams": current_teams,
-        "outcome": outcome,
+        "current_joinedteams": current_joinedteams,
+        "current_leadteams" : current_leadteams,
+        "resultpost": resultpost,
         "feedback": feedback,
     }
 

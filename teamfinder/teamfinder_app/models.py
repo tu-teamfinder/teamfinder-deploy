@@ -7,6 +7,8 @@ class User(models.Model):
     name = models.CharField(max_length=255)
     major = models.CharField(max_length=255)
     year = models.IntegerField()
+    profile_image = models.ImageField(null=True, blank=True, default="fallback.png", upload_to="images/")
+    faculty = models.CharField(max_length=255)
 
 class Group(models.Model):
     group_id = models.AutoField(primary_key=True)
@@ -89,3 +91,7 @@ class Feedback(models.Model):
     technical_pt = models.IntegerField()
     empathy_pt = models.IntegerField()
     comment = models.TextField(blank=True)
+
+
+
+    

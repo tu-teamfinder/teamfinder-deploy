@@ -1,45 +1,10 @@
 {% extends 'base.html' %}
-{% block title %}My account{% endblock %}
 {% block content %}
-id : {{user_id}} <br>
-name : {{userdata.name}} <br>
-major : {{userdata.major}} <br>
-year : {{userdata.year}} <br>
-email : {{userdata.email_address}} <br>
--------------------------------------- <br>
-created_post <br>
-{% for post in created_post %}
-creater : {{post.user}} <br>
-header : {{post.heading}} <br>
-content : {{post.content}} <br>
-timestamp : {{post.timestamp}} <br>
-{% endfor %}
--------------------------------------- <br>
-outcome <br>
-{% for post in outcome %}
-creater : {{post.user}} <br>
-header : {{post.heading}} <br>
-content : {{post.content}} <br>
-timestamp : {{post.timestamp}} <br>
-{% endfor %}
--------------------------------------- <br>
-feedback <br>
-{% for fb in feedback %}
-message : {{fb.message.massage}} <br>
-timestamp : {{fb.message.timestamp}} <br>
-{% endfor %}
--------------------------------------- <br>
-current <br>
-{% for post in created_post %}
-creater : {{post.user}} <br>
-header : {{post.heading}} <br>
-content : {{post.content}} <br>
-timestamp : {{post.timestamp}} <br>
-{% endfor %}
-{% for reg in outcome %}
-creater : {{reg.post.user}} <br>
-header : {{reg.post.heading}} <br>
-content : {{reg.post.content}} <br>
-timestamp : {{reg.post.timestamp}} <br>
-{% endfor %}
-{% endblock %}  
+<a href="upload-profile/">Upload</a>
+<div class="col-md-4">
+    <br>
+    <img src="media/images/{{userdata.profile_image}}" alt="ooh"> 
+</div>
+
+
+{% endblock %}
