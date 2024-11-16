@@ -1,4 +1,5 @@
 from django.db import models
+from taggit.managers import TaggableManager
 
 class User(models.Model):
     user_id = models.CharField(primary_key=True, max_length=32)
@@ -6,6 +7,7 @@ class User(models.Model):
     email_address = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     major = models.CharField(max_length=255)
+    faculty = models.CharField(max_length=255)
     year = models.IntegerField()
 
 class Group(models.Model):
@@ -36,6 +38,8 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     heading = models.CharField(max_length=255)
     content = models.TextField()
+    finish = models.BooleanField()
+    amount = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class PostComment(models.Model):
@@ -48,11 +52,11 @@ class PostComment(models.Model):
 
 class ResultPost(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
-    tag = models.CharField(max_length=255)
+    tag = TaggableManager()
 
 class RecruitPost(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
-    tag = models.CharField(max_length=255)
+    tag = TaggableManager()
     status = models.CharField(max_length=50)
 
 class Requirement(models.Model):
