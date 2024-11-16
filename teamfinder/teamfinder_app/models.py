@@ -31,10 +31,6 @@ class GroupMessage(models.Model):
     message = models.OneToOneField(Message, on_delete=models.CASCADE, primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="group_messages")
 
-class FeedbackMessage(models.Model):
-    message = models.OneToOneField(Message, on_delete=models.CASCADE, primary_key=True)
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_feedback_messages")
-
 class Post(models.Model):
     post_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
@@ -74,9 +70,22 @@ class Request(models.Model):
     message = models.TextField()
     requirement = models.ForeignKey(Requirement, on_delete=models.CASCADE)
 
-class Registration(models.Model):
-    registration_id = models.AutoField(primary_key=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="registrations")
-    request = models.ForeignKey(Request, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class Team(models.Model):
+    team_id = models.AutoField(primary_key=True)
+    team_leader = models.ForeignKey(User, on_delete=models.CASCADE, related_name='led_teams')
+    recruit_post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
 
+class TeamMember(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    member = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Feedback(models.Model):
+    feedback_id = models.AutoField(primary_key=True)
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_feedbacks')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_feedbacks')
+    communication_pt = models.IntegerField()
+    collaboration_pt = models.IntegerField()
+    reliability_pt = models.IntegerField()
+    technical_pt = models.IntegerField()
+    empathy_pt = models.IntegerField()
+    comment = models.TextField(blank=True)
