@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
-from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Requirement, FeedbackMessage, Registration
+from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Requirement
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
 
@@ -58,7 +58,7 @@ def web_login(request):
                     email_address=data["email"],
                     name=data["displayname_en"],
                     major=data["department"],
-                    faculty=data["fuculty"],
+                    faculty=data["faculty"],
                     year=year
                 )
                 user_profile.save()
@@ -91,9 +91,9 @@ def web_login(request):
 def myaccount(request):
     user = User.objects.get(user_id=get_user(request))
     created_post = RecruitPost.objects.filter(post__user=user)
-    current_teams = Registration.objects.filter(user=user)
+    current_teams = None
     outcome = ResultPost.objects.filter(post__user=user)
-    feedback = FeedbackMessage.objects.filter(receiver=user)
+    feedback = None
     # ต้องเอา created_post ใส่ด้วย ^
 
     context = {
@@ -174,13 +174,14 @@ def create_post(request):
         user = User.objects.get(user_id=get_user(request))
         heading = request.POST.get('heading')
         content = request.POST.get('content')
-        amount = request.POST.get('amounnt')
+        amount = request.POST.get('amount')
 
         
         post = Post.objects.create(
             user=user,
             heading=heading,
-            content=content
+            content=content,
+            amount=amount
         )
         post.save()
 
