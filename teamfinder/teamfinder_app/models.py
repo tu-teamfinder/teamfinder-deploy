@@ -57,7 +57,7 @@ class ResultPost(models.Model):
 class RecruitPost(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
     tag = TaggableManager()
-    status = models.CharField(max_length=50)
+    status = models.BooleanField(default=True)
 
 class Requirement(models.Model):
     require_id = models.AutoField(primary_key=True)
