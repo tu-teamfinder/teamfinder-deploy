@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
-from teamfinder_app.models import User, Post, RecruitPost, ResultPost, FeedbackMessage, Registration
+from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Requirement, FeedbackMessage, Registration
 from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
@@ -169,8 +169,8 @@ def create_post(request):
         user = User.objects.get(user_id=get_user(request))
         heading = request.POST.get('heading')
         content = request.POST.get('content')
-        tag = request.POST.get('tag')
-        status = request.POST.get('status')
+        amount = request.POST.get('amounnt')
+
         
         post = Post.objects.create(
             user=user,
@@ -179,16 +179,85 @@ def create_post(request):
         )
         post.save()
 
+        return web_requirement(request, post)
+
+    return render(request, 'create.html')
+
+
+#Requirement
+def web_requirement(request, post):
+    if request.method == 'POST':
+        tag = None
+        req_faculty = None
+        req_major = None
+        year = None
+        description = None
+
         recruit = RecruitPost.objects.create(
             post=post,
             tag=tag,
-            status=status
+            status=True
         )
         recruit.save()
 
+        requirement = Requirement.objects.create(
+            post=recruit,
+            req_faculty=req_faculty,
+            req_major = req_major,
+            year = year,
+            description = description
+        )
+        requirement.save()
+
         return redirect('/recruitment')
 
-    return render(request, 'create.html')
+    return render(request, 'requirement.html')
+
+
+#Team
+def team(request):
+    user = User.objects.get(user_id=get_user(request))
+    active = None
+    finished = None
+
+    context = {
+            "active": active,
+            "finished": finished
+    }
+
+    return render(request, 'team.html', context)
+
+
+#Finish
+def finish(request, post):
+
+    return post_result(request, post)
+
+
+#Post result
+def post_result(request, post):
+    if request.method == 'POST':
+        user = User.objects.get(user_id=get_user(request))
+        heading = request.POST.get('heading')
+        content = request.POST.get('content')
+        tag = None
+
+        recruit = RecruitPost.objects.get(post=post)
+        recruit.delete()
+
+        res = ResultPost.objects.create(
+            post=post,
+            tag=tag
+        )
+
+        return redirect('/result')
+
+    context = {
+        "heading": post.heading,
+        "content": post.content
+    }
+
+    return render(request, 'post_result.html', context)
 
 
 #Search
