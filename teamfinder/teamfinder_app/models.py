@@ -38,7 +38,7 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     heading = models.CharField(max_length=255)
     content = models.TextField()
-    finish = models.BooleanField()
+    finish = models.BooleanField(default=False)
     amount = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
