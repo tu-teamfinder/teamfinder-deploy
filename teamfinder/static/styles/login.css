@@ -56,8 +56,8 @@ body::after {
     border: 1px solid  black;
     border-radius: 40px;
     font-size:16px;
-    padding: 20px 45px 20px 20px;
     color:black;
+    padding: 20px 45px 20px 20px;
 }
 
 .input-box input::placeholder{
