@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage</title>
+    <style>
+        body, html {
+            background-color: #63666a;
+            color: white;
+        }
+        .container{
+            display: inline-flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 50px;  
+        }
+        .user-container{
+            width: 350px;
+            display: inline-flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px 20px;
+            background-color: #3e3e3e;
+            border-radius: 15px;
+        }
+        .text-section {
+            max-width: 600px;
+        }
+        .text-section h1 {
+            font-size: 48px;
+            margin: 0;
+        }
+        .text-section h2 {
+            font-size: 32px;
+            color: #FFD700;
+            
+        }
+        .text-section h3 {
+            font-size: 24px;
+            margin: 0;
+        }
+        .text-section p {
+            font-size: 16px;
+            margin: 20px 0;
+        }
+        .button{
+            display: inline-block;
+            padding: 15px 25px;
+            background-color: #ffd13f;
+            color:black;
+            border-radius: 5px;
+        }
+        .button:hover{
+            background-color: #d8b235;
+        }
+        .image-section img {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-section">
+            <h1>Team Finder</h1>
+            <h2>Thammasat University</h2>
+            <p>You can form a team with other people from Thammasat University to make project or compete in competition by using Team Finder</p>
+            <a href="/myaccount" class="button">Go to website</a>
+        </div>
+    </div>
+    <div class="user-container">
+        <div class="text-section">
+            <h2>Current Users</h2>
+            <h3>x users</h3>
+        </div>
+    </div>
+    <div class="image-section">
+        
+    </div>
+</body>
+</html>
