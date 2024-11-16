@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Post</title>
+    <title>Create Recruitment Post</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -50,36 +50,36 @@
 </head>
 <body>
     <div class="form-container">
-        <h2>Create a Post</h2>
-
-        <!-- Display a warning if there are too many tags -->
-        {% if tags|length > 3 %}
-            <p class="error">You can add a maximum of 3 tags.</p>
-        {% endif %}
+        <h2>Create Recruitment Post</h2>
 
         <form method="POST" action="">
             {% csrf_token %}
+
+            <!-- Required Faculty -->
             <div class="form-group">
-                <label for="heading">Heading</label>
-                <input type="text" id="heading" name="heading" value="{{ heading|default:'' }}" required>
+                <label for="req_faculty">Required Faculty (comma-separated)</label>
+                <input type="text" id="req_faculty" name="req_faculty" placeholder="e.g., Computer Science, Engineering" required>
             </div>
 
+            <!-- Required Major -->
             <div class="form-group">
-                <label for="content">Content</label>
-                <textarea id="content" name="content" rows="5" required>{{ content|default:'' }}</textarea>
+                <label for="req_major">Required Major (comma-separated)</label>
+                <input type="text" id="req_major" name="req_major" placeholder="e.g., Software Engineering, Data Science" required>
             </div>
 
+            <!-- Year Input -->
             <div class="form-group">
-                <label for="amount">Amount</label>
-                <input type="number" id="amount" name="amount" value="{{ amount|default:'' }}" required>
+                <label for="year">Year</label>
+                <input type="text" id="year" name="year" placeholder="e.g., 2024" required>
             </div>
 
+            <!-- Description -->
             <div class="form-group">
-                <label for="tag">Tags (comma-separated, max 3)</label>
-                <input type="text" id="tag" name="tag" value="{{ tags|join:', '|default:'' }}" placeholder="e.g., django, python, web development" required>
+                <label for="description">Description</label>
+                <textarea id="description" name="description" rows="5" required></textarea>
             </div>
 
-            <button type="submit">Create Post</button>
+            <button type="submit">Create Recruitment Post</button>
         </form>
     </div>
 </body>

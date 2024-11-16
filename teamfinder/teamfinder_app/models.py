@@ -1,4 +1,6 @@
 from django.db import models
+from taggit.managers import TaggableManager
+from taggit.models import TagBase, GenericTaggedItemBase
 
 class User(models.Model):
     user_id = models.CharField(primary_key=True, max_length=32)
@@ -6,9 +8,22 @@ class User(models.Model):
     email_address = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     major = models.CharField(max_length=255)
+    faculty = models.CharField(max_length=255)
     year = models.IntegerField()
     profile_image = models.ImageField(null=True, blank=True, default="fallback.png", upload_to="images/")
     faculty = models.CharField(max_length=255)
+
+class Faculty(TagBase):
+    faculty = models.TextField()
+
+class FacultyTag(GenericTaggedItemBase):
+    tag = models.ForeignKey(Faculty, on_delete=models.CASCADE, related_name="faculty_tag")
+
+class Major(TagBase):
+    major = models.TextField()
+
+class MajorTag(GenericTaggedItemBase):
+    tag = models.ForeignKey(Major, on_delete=models.CASCADE, related_name="major_tag")
 
 class Group(models.Model):
     group_id = models.AutoField(primary_key=True)
@@ -38,6 +53,8 @@ class Post(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     heading = models.CharField(max_length=255)
     content = models.TextField()
+    finish = models.BooleanField(default=False)
+    amount = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class PostComment(models.Model):
@@ -50,19 +67,19 @@ class PostComment(models.Model):
 
 class ResultPost(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
-    tag = models.CharField(max_length=255)
+    tag = TaggableManager()
 
 class RecruitPost(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
-    tag = models.CharField(max_length=255)
-    status = models.CharField(max_length=50)
+    tag = TaggableManager()
+    status = models.BooleanField(default=True)
 
 class Requirement(models.Model):
     require_id = models.AutoField(primary_key=True)
     post = models.ForeignKey(RecruitPost, on_delete=models.CASCADE, related_name="requirements")
-    req_faculty = models.CharField(max_length=255)
-    req_major = models.CharField(max_length=255)
-    year = models.IntegerField()
+    req_faculty = TaggableManager(through=FacultyTag)
+    req_major = TaggableManager(through=MajorTag)
+    year = models.CharField(max_length=10, blank=True)
     description = models.TextField()
 
 class Request(models.Model):
