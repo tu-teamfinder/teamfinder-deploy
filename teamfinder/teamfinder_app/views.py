@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
-from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Requirement
+from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Requirement, Faculty, Major
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
 
@@ -63,8 +63,13 @@ def web_login(request):
                 )
                 user_profile.save()
 
-                Tag.objects.get_or_create(name=data["department"])
-                Tag.objects.get_or_create(name=data["faculty"])
+                faculty = Faculty.objects.get_or_create(
+                    name=data["faculty"], slug=data["faculty"], faculty=data["faculty"]
+                )
+
+                major = Major.objects.get_or_create(
+                    name=data["department"], slug=data["department"], major=data["department"]
+                )
 
                 create_user = authmodel.User.objects.create_user(
                     username = username,
@@ -116,21 +121,14 @@ def web_logout(request):
 
 #Recruitment Post
 def recruitment(request):
-    user = User.objects.get(user_id=get_user(request))
-    user_tag = [user.major, user.year, 'all']
-    recruit_posts = [
-        RecruitPost.objects.filter(tag__in=user_tag)
-    ]
+    recruit_posts = RecruitPost.objects.filter(status=True)
 
     posts = []
-    status = []
     for post in recruit_posts:
         posts.append(post.post)
-        status.append(post.status)
 
     context = {
         "posts": posts,
-        "status": status
     }
 
     return render(request, 'recruitment.html', context)
@@ -138,11 +136,14 @@ def recruitment(request):
 
 #Result Post
 def result(request):
-    user = User.objects.get(user_id=get_user(request))
     result_posts = ResultPost.objects.all()
 
+    posts = []
+    for post in result_posts:
+        posts.append(post.post)
+
     context = {
-        "result_posts": result_posts
+        "post": post
     }
 
     return render(request, 'result.html', context)
@@ -175,8 +176,44 @@ def create_post(request):
         heading = request.POST.get('heading')
         content = request.POST.get('content')
         amount = request.POST.get('amount')
+        tags = [tag.strip() for tag in request.POST.get('tag').split(',')]
 
-        
+        if len(tags) > 3:
+            context = {
+                "heading": heading,
+                "content": content,
+                "amount": amount,
+                "tags": tags
+            }
+
+            return render(request, 'create.html', context)
+
+        request.session['user'] = user
+        request.session['heading'] = heading
+        request.session['content'] = content
+        request.session['amount'] = amount
+        request.session['tags'] = tags
+
+        return redirect('/create/requirement')
+
+    return render(request, 'create.html')
+
+
+#Requirement
+def web_requirement(request):
+    
+    user = request.session.get('user')
+    heading = request.session.get('heading')
+    content = request.session.get('content')
+    amount = request.session.get('amount')
+    tags = request.session.get('tags')
+
+    if request.method == 'POST':
+        req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',')]
+        req_major = [major.strip() for major in request.POST.get('req_major').split(',')]
+        year = request.POST.get('year')
+        description = request.POST.get('description')
+
         post = Post.objects.create(
             user=user,
             heading=heading,
@@ -185,34 +222,20 @@ def create_post(request):
         )
         post.save()
 
-        return web_requirement(request, post)
-
-    return render(request, 'create.html')
-
-
-#Requirement
-def web_requirement(request, post):
-    if request.method == 'POST':
-        tag = None
-        req_faculty = None
-        req_major = None
-        year = None
-        description = None
-
         recruit = RecruitPost.objects.create(
             post=post,
-            tag=tag,
             status=True
         )
+        recruit.tag.set(tags)
         recruit.save()
 
         requirement = Requirement.objects.create(
             post=recruit,
-            req_faculty=req_faculty,
-            req_major = req_major,
-            year = year,
-            description = description
+            year=year,
+            description=description
         )
+        requirement.req_faculty.set(req_faculty)
+        requirement.req_major.set(req_major)
         requirement.save()
 
         return redirect('/recruitment')
