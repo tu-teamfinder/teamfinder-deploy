@@ -11,7 +11,7 @@ class User(models.Model):
     faculty = models.CharField(max_length=255)
     year = models.IntegerField()
     profile_image = models.ImageField(null=True, blank=True, default="fallback.png", upload_to="images/")
-    faculty = models.CharField(max_length=255)
+
 
 class Faculty(TagBase):
     faculty = models.TextField()
