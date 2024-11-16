@@ -1,4 +1,5 @@
 from django.db import models
+from taggit.managers import TaggableManager
 
 class User(models.Model):
     user_id = models.CharField(primary_key=True, max_length=32)
@@ -6,6 +7,7 @@ class User(models.Model):
     email_address = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     major = models.CharField(max_length=255)
+    faculty = models.CharField(max_length=255)
     year = models.IntegerField()
 
 class Group(models.Model):
@@ -31,15 +33,13 @@ class GroupMessage(models.Model):
     message = models.OneToOneField(Message, on_delete=models.CASCADE, primary_key=True)
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="group_messages")
 
-class FeedbackMessage(models.Model):
-    message = models.OneToOneField(Message, on_delete=models.CASCADE, primary_key=True)
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_feedback_messages")
-
 class Post(models.Model):
     post_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
     heading = models.CharField(max_length=255)
     content = models.TextField()
+    finish = models.BooleanField(default=False)
+    amount = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class PostComment(models.Model):
@@ -52,12 +52,12 @@ class PostComment(models.Model):
 
 class ResultPost(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
-    tag = models.CharField(max_length=255)
+    tag = TaggableManager()
 
 class RecruitPost(models.Model):
     post = models.OneToOneField(Post, on_delete=models.CASCADE, primary_key=True)
-    tag = models.CharField(max_length=255)
-    status = models.CharField(max_length=50)
+    tag = TaggableManager()
+    status = models.BooleanField(default=True)
 
 class Requirement(models.Model):
     require_id = models.AutoField(primary_key=True)
@@ -74,9 +74,22 @@ class Request(models.Model):
     message = models.TextField()
     requirement = models.ForeignKey(Requirement, on_delete=models.CASCADE)
 
-class Registration(models.Model):
-    registration_id = models.AutoField(primary_key=True)
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="registrations")
-    request = models.ForeignKey(Request, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+class Team(models.Model):
+    team_id = models.AutoField(primary_key=True)
+    team_leader = models.ForeignKey(User, on_delete=models.CASCADE, related_name='led_teams')
+    recruit_post = models.ForeignKey(Post, on_delete=models.SET_NULL, null=True)
 
+class TeamMember(models.Model):
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    member = models.ForeignKey(User, on_delete=models.CASCADE)
+
+class Feedback(models.Model):
+    feedback_id = models.AutoField(primary_key=True)
+    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_feedbacks')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_feedbacks')
+    communication_pt = models.IntegerField()
+    collaboration_pt = models.IntegerField()
+    reliability_pt = models.IntegerField()
+    technical_pt = models.IntegerField()
+    empathy_pt = models.IntegerField()
+    comment = models.TextField(blank=True)

@@ -4,8 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
-from teamfinder_app.models import User, Post, RecruitPost, ResultPost, FeedbackMessage, Registration
+from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Requirement
 from django.core.exceptions import ObjectDoesNotExist
+from taggit.models import Tag
 
 # Create your views here.
 
@@ -57,9 +58,13 @@ def web_login(request):
                     email_address=data["email"],
                     name=data["displayname_en"],
                     major=data["department"],
+                    faculty=data["faculty"],
                     year=year
                 )
                 user_profile.save()
+
+                Tag.objects.get_or_create(name=data["department"])
+                Tag.objects.get_or_create(name=data["faculty"])
 
                 create_user = authmodel.User.objects.create_user(
                     username = username,
@@ -86,9 +91,9 @@ def web_login(request):
 def myaccount(request):
     user = User.objects.get(user_id=get_user(request))
     created_post = RecruitPost.objects.filter(post__user=user)
-    current_teams = Registration.objects.filter(user=user)
+    current_teams = None
     outcome = ResultPost.objects.filter(post__user=user)
-    feedback = FeedbackMessage.objects.filter(receiver=user)
+    feedback = None
     # ต้องเอา created_post ใส่ด้วย ^
 
     context = {
@@ -169,26 +174,96 @@ def create_post(request):
         user = User.objects.get(user_id=get_user(request))
         heading = request.POST.get('heading')
         content = request.POST.get('content')
-        tag = request.POST.get('tag')
-        status = request.POST.get('status')
+        amount = request.POST.get('amount')
+
         
         post = Post.objects.create(
             user=user,
             heading=heading,
-            content=content
+            content=content,
+            amount=amount
         )
         post.save()
+
+        return web_requirement(request, post)
+
+    return render(request, 'create.html')
+
+
+#Requirement
+def web_requirement(request, post):
+    if request.method == 'POST':
+        tag = None
+        req_faculty = None
+        req_major = None
+        year = None
+        description = None
 
         recruit = RecruitPost.objects.create(
             post=post,
             tag=tag,
-            status=status
+            status=True
         )
         recruit.save()
 
+        requirement = Requirement.objects.create(
+            post=recruit,
+            req_faculty=req_faculty,
+            req_major = req_major,
+            year = year,
+            description = description
+        )
+        requirement.save()
+
         return redirect('/recruitment')
 
-    return render(request, 'create.html')
+    return render(request, 'requirement.html')
+
+
+#Team
+def team(request):
+    user = User.objects.get(user_id=get_user(request))
+    active = None
+    finished = None
+
+    context = {
+            "active": active,
+            "finished": finished
+    }
+
+    return render(request, 'team.html', context)
+
+
+#Finish
+def finish(request, post):
+
+    return post_result(request, post)
+
+
+#Post result
+def post_result(request, post):
+    if request.method == 'POST':
+        user = User.objects.get(user_id=get_user(request))
+        heading = request.POST.get('heading')
+        content = request.POST.get('content')
+        tag = None
+
+        recruit = RecruitPost.objects.get(post=post)
+        recruit.delete()
+
+        res = ResultPost.objects.create(
+            post=post,
+            tag=tag
+        )
+
+        return redirect('/result')
+
+    context = {
+        "heading": post.heading,
+        "content": post.content
+    }
+
+    return render(request, 'post_result.html', context)
 
 
 #Search
