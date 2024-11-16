@@ -172,7 +172,6 @@ def web_post(request, post_id):
 #Create Post
 def create_post(request):
     if request.method == 'POST':
-        user = User.objects.get(user_id=get_user(request))
         heading = request.POST.get('heading')
         content = request.POST.get('content')
         amount = request.POST.get('amount')
@@ -188,7 +187,6 @@ def create_post(request):
 
             return render(request, 'create.html', context)
 
-        request.session['user'] = user
         request.session['heading'] = heading
         request.session['content'] = content
         request.session['amount'] = amount
@@ -201,8 +199,7 @@ def create_post(request):
 
 #Requirement
 def web_requirement(request):
-    
-    user = request.session.get('user')
+    user = User.objects.get(user_id=get_user(request))
     heading = request.session.get('heading')
     content = request.session.get('content')
     amount = request.session.get('amount')
