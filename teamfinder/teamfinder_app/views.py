@@ -177,7 +177,7 @@ def create_post(request):
         heading = request.POST.get('heading')
         content = request.POST.get('content')
         amount = int(request.POST.get('amount'))
-        tags = [tag.strip() for tag in request.POST.get('tag').split(',') if tag.strip()]
+        tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
         tags_invalid = False
         amount_invalid = False
 
