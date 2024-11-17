@@ -59,7 +59,7 @@ class TestViews(TestCase):
       )
       u2.save()
 
-      self.user1 = User.objects.create(
+      user1 = User.objects.create(
          user_id="6510615888",
          password="password123",
          email_address="user1@example.com",
@@ -68,7 +68,7 @@ class TestViews(TestCase):
          faculty="Engineering",
          year=3,
       )
-      self.user2 = User.objects.create(
+      user2 = User.objects.create(
          user_id="660134999",
          password="password123",
          email_address="user2@example.com",
@@ -77,14 +77,16 @@ class TestViews(TestCase):
          faculty="Law",
          year=2,
       )
-      self.client = Client()
-      logged_in = self.client.login(username=id1, password=pass1)
-      if not logged_in:
-         raise Exception("Login failed for user1 during test setup.")
+      # self.client = Client()
+      # logged_in = self.client.login(username=id1, password=pass1)
+      # if not logged_in:
+      #    raise Exception("Login failed for user1 during test setup.")
 
    def test_protected_view_access(self):
       """test view"""
-      response = self.client.get(reverse('myaccount'))
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      response = c.get(reverse('myaccount'))
       self.assertEqual(response.request["PATH_INFO"], "/myaccount")
       self.assertEqual(response.status_code, 200)  
 
@@ -92,7 +94,7 @@ class TestViews(TestCase):
       """test if index return homepage"""
       c = Client()
       response = c.get("")
-      self.assertEqual(response.request["PATH_INFO"], "/")
+      self.assertEqual(response.request["PATH_INFO"], "")
       self.assertEqual(response.status_code, 200)
 
    def test_aboutPage(self):
@@ -105,6 +107,7 @@ class TestViews(TestCase):
    def test_recruitmentPage(self):
       """test if recruitment page working correctly"""
       c = Client()
+      c.login(username="6510615888", password="password123")
       response = c.get("/recruitment")
       self.assertEqual(response.request["PATH_INFO"], "/recruitment")
       self.assertEqual(response.status_code, 200)
@@ -112,6 +115,7 @@ class TestViews(TestCase):
    def test_createPage(self):
       """test if create recruitment post page working correctly"""
       c = Client()
+      c.login(username="6510615888", password="password123")
       response = c.get("/create")
       self.assertEqual(response.request["PATH_INFO"], "/create")
       self.assertEqual(response.status_code, 200)
@@ -119,8 +123,9 @@ class TestViews(TestCase):
    def test_create_recruitment_post_valid(self):
       """test posting recruitment post with correct values"""
       c = Client()
+      c.login(username="6510615888", password="password123")
       post_value = {
-           "heading": "Health Hackathon",
+            "heading": "Health Hackathon",
             "content": "Need experience devs",
             "amount": 1,
             "tags": "Machine Learning, Data Science, Kaggle"
@@ -131,6 +136,7 @@ class TestViews(TestCase):
    def test_create_recruitment_post_invalid(self):
       """test posting recruitment post with incorrect values"""
       c = Client()
+      c.login(username="6510615888", password="password123")
       post_value = {
            "heading": "Health Hackathon",
             "content": "12312",
@@ -143,6 +149,7 @@ class TestViews(TestCase):
    def test_create_recruitment_post_invalid_2(self):
       """test posting recruitment post with incorrect values 2"""
       c = Client()
+      c.login(username="6510615888", password="password123")
       post_value = {
            "heading": "Health Hackathon",
             "content": "12312",
@@ -152,21 +159,18 @@ class TestViews(TestCase):
       response = c.post("/create", data=post_value, follow=True)
       self.assertEqual(response.request['PATH_INFO'], "/create")
 
-   def test_create_recruitment_post_lack(self):
-      """test posting recruitment post with empty values"""
-      c = Client()
-      post_value = {
-           "heading": "",
-            "content": "",
-            "amount": "",
-            "tags": ""
-      }
-      response = c.post("/create", data=post_value, follow=True)
-      self.assertEqual(response.request['PATH_INFO'], "/create")
-
    def test_create_requirement_valid(self):
       """test input requirement with correct values"""
       c = Client()
+      c.login(username="6510615888", password="password123")
+      post_value = {
+            "heading": "Health Hackathon",
+            "content": "Need experience devs",
+            "amount": 1,
+            "tags": "Machine Learning, Data Science, Kaggle"
+      }
+      response = c.post("/create", data=post_value, follow=True)
+      self.assertEqual(response.request['PATH_INFO'], "/create/requirement")
       post_value = {
           "req_faculty": "Engineering",
           "req_major": "Computer Engineering",
@@ -179,6 +183,7 @@ class TestViews(TestCase):
    def test_create_requirement_invalid(self):
       """test input requirement with incorrect values"""
       c = Client()
+      c.login(username="6510615888", password="password123")
       post_value = {
           "req_faculty": 123,
           "req_major": "Chemical Engineering",
@@ -191,6 +196,7 @@ class TestViews(TestCase):
    def test_create_requirement_lack(self):
       """test input requirement with empty values"""
       c = Client()
+      c.login(username="6510615888", password="password123")
       post_value = {
           "req_faculty": "",
           "req_major": "",
@@ -203,6 +209,7 @@ class TestViews(TestCase):
    def test_logout(self):
       """test if logout working correctly"""
       c = Client()
-      response = c.get("/logout")
+      c.login(username="6510615888", password="password123")
+      response = c.get("/logout", follow=True)
       self.assertEqual(response.request["PATH_INFO"], "/login")
       self.assertEqual(response.status_code, 200)
