@@ -9,17 +9,23 @@ body {
     padding: 20px;
     background-color: #3e3e3e;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 .form-group {
     margin-bottom: 15px;
+    color:white;
 }
+
 label {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
 }
+input {
+    color: white;
+}
+
 input, textarea {
     width: 100%;
     padding: 10px;
@@ -27,7 +33,9 @@ input, textarea {
     background-color: #2e2e2e;
     border: 1px solid #ccc;
     border-radius: 5px;
+    color: white;
 }
+
 .button {
     background-color: #ffd13f;
     color: black;
@@ -44,11 +52,24 @@ input, textarea {
     color: red;
     font-size: 0.9em;
 }
+
 .tagify{    
     width: 100%;
     max-width: 700px;
-    }
-    
+    border-radius: 5px;
+    --placeholder-color: rgba(255, 255, 255, 0.5);
+    background-color: #2e2e2e;
+    --placeholder-color-focus: rgba(255, 255, 255, 0.5);
+}
+
+
+input::placeholder {
+    color: white;
+    opacity: 0.5; 
+}
+
+
+
 .tags-look .tagify__dropdown__item{
 display: inline-block;
 border-radius: 3px;

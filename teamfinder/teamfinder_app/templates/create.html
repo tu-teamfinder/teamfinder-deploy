@@ -1,6 +1,6 @@
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,8 +10,8 @@
     <link rel="stylesheet" href="{% static 'styles/create.css' %}">
 </head>
 <body>
-    <div class="form-container">
-        <h2>Create a Post</h2>
+    <div class="form-container mt-4">
+        <h1 style="color: white; font-weight:0;">Create a Post</h1>
 
         <!-- Display a warning if there are too many tags -->
         {% if tags_invalid %}
@@ -24,7 +24,7 @@
         <form method="POST" action="">
             {% csrf_token %}
             <div class="form-group">
-                <label for="heading">Heading</label>
+                <label for="heading" style="font-weight:0;">Heading</label>
                 <input type="text" id="heading" name="heading" value="{{ heading|default:'' }}" required>
             </div>
 
@@ -40,10 +40,9 @@
 
             <div class="form-group">
                 <label for="tag">Tags (comma-separated, max 3)</label>
-                <input name='tags' class='some_class_name' placeholder='write some tags' value=''>
+                <input name='tags' class='tag_input' placeholder='write some tags' value=''>
                 <script>
                     var input = document.querySelector('input[name="tags"]');
-
                     var whitelist = {{tag_list|safe}};
 
                     var tagify = new Tagify(input, {
@@ -58,10 +57,10 @@
                     })
                 </script>
             </div>
-
-            <a href="/recruitment " class="button" >Cancel</a>
+            <button href="/recruitment " class="button" style="margin-right:10px; background-color:#ff7851;">Cancel</a>
             <button type="submit" class="button">Next</button>
         </form>
     </div>
 </body>
 </html>
+{% endblock %}
