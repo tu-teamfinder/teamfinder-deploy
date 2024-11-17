@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout, get_user
 from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
-
+import json
 # Create your views here.
 
 #Homepage
@@ -177,7 +177,10 @@ def create_post(request):
         heading = request.POST.get('heading')
         content = request.POST.get('content')
         amount = int(request.POST.get('amount'))
-        tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
+        try:
+            tags = [tag["value"] for tag in json.loads(request.POST.get('tags'))]
+        except json.JSONDecodeError:
+            tags = []
         tags_invalid = False
         amount_invalid = False
 
@@ -219,9 +222,19 @@ def web_requirement(request):
     amount = request.session.get('amount')
     tags = request.session.get('tags')
 
+    faculty_list = [faculty.name for faculty in Faculty.objects.all()]
+    major_list = [major.name for major in Major.objects.all()]
+
+    context = {
+        "faculty_list": faculty_list,
+        "major_list": major_list
+    }
+
     if request.method == 'POST':
-        req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',') if faculty.strip()]
-        req_major = [major.strip() for major in request.POST.get('req_major').split(',') if major.strip()]
+        # req_faculty = [faculty["value"] for faculty in json.loads(request.POST.get('req_faculty'))]
+        # req_major = [major["value"] for major in json.loads(request.POST.get('req_major'))]
+        req_faculty = request.POST.get('req_faculty')
+        req_major = request.POST.get('req_major')
         year = request.POST.get('year')
         description = request.POST.get('description')
 
@@ -256,7 +269,7 @@ def web_requirement(request):
     
     request.session['visted_create'] = False
 
-    return render(request, 'requirement.html')
+    return render(request, 'requirement.html', context)
 
 
 #Team
