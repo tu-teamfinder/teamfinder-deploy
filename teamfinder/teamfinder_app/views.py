@@ -6,7 +6,6 @@ import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
 from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major
 from django.core.exceptions import ObjectDoesNotExist
-
 from taggit.models import Tag
 
 # Create your views here.
@@ -192,6 +191,7 @@ def create_post(request):
         request.session['content'] = content
         request.session['amount'] = amount
         request.session['tags'] = tags
+        request.session['visted_create'] = True
 
         return redirect('/create/requirement')
 
@@ -237,6 +237,11 @@ def web_requirement(request):
         requirement.save()
 
         return redirect('/recruitment')
+    
+    elif not request.session.get('visted_create'):
+        return redirect('/create')
+    
+    request.session['visted_create'] = False
 
     return render(request, 'requirement.html')
 
