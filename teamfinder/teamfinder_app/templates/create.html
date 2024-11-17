@@ -1,96 +1,24 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Post</title>
-    <style>
-        body {
-            background-color: #63666a;
-            color:white;
-            font-family: Arial, sans-serif;
-        }
-        .form-container {
-            width: 50%;
-            margin: auto;
-            padding: 20px;
-            background-color: #3e3e3e;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 5px;
-            background-color: #2e2e2e;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .button {
-            background-color: #ffd13f;
-            color: black;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .button:hover {
-            background-color: #d8b235;
-        }
-        .error {
-            color: red;
-            font-size: 0.9em;
-        }
-        .tags-look .tagify__dropdown__item{
-            display: inline-block;
-            vertical-align: middle;
-            border-radius: 3px;
-            padding: .3em .5em;
-            border: 1px solid #CCC;
-            background: #F3F3F3;
-            margin: .2em;
-            font-size: .85em;
-            color: black;
-            transition: 0s;
-        }
-
-        .tags-look .tagify__dropdown__item--active{
-            border-color: black;
-        }
-
-        .tags-look .tagify__dropdown__item:hover{
-            background: lightyellow;
-            border-color: gold;
-        }
-
-        .tags-look .tagify__dropdown__item--hidden {
-            max-width: 0;
-            max-height: initial;
-            padding: .3em 0;
-            margin: .2em 0;
-            white-space: nowrap;
-            text-indent: -20px;
-            border: 0;
-        }
-    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>   
+    <link rel="stylesheet" href="{% static 'styles/create.css' %}">
 </head>
 <body>
     <div class="form-container">
         <h2>Create a Post</h2>
 
         <!-- Display a warning if there are too many tags -->
-        {% if tags|length > 3 %}
+        {% if tags_invalid %}
             <p class="error">You can add a maximum of 3 tags.</p>
+        {% endif %}
+        {% if amount_invalid %}
+            <p class="error">Amount can be 1 - 50</p>
         {% endif %}
 
         <form method="POST" action="">
@@ -112,12 +40,11 @@
 
             <div class="form-group">
                 <label for="tag">Tags (comma-separated, max 3)</label>
-                <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
-                <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js"></script>
-                <link href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css" rel="stylesheet" type="text/css" />
+                <input name='tags' class='some_class_name' placeholder='write some tags' value=''>
                 <script>
                     var input = document.querySelector('input[name="tags"]');
-                    var whitelist = ["A# .NET", "A# (Axiom)", "A-0 System", "A+", "A++", "ABAP", "ABC", "ABC ALGOL", "ABSET", "ABSYS", "ACC", "Accent", "Ace DASL", "ACL2", "Avicsoft", "ACT-III", "Action!", "ActionScript", "Ada", "Adenine", "Agda", "Agilent VEE", "Agora", "AIMMS", "Alef", "ALF", "ALGOL 58", "ALGOL 60", "ALGOL 68", "ALGOL W", "Alice", "Alma-0", "AmbientTalk", "Amiga E", "AMOS", "AMPL", "Apex (Salesforce.com)", "APL", "AppleScript", "Arc", "ARexx", "Argus", "AspectJ", "Assembly language", "ATS", "Ateji PX", "AutoHotkey", "Autocoder", "AutoIt", "AutoLISP / Visual LISP", "Averest", "AWK", "Axum", "Active Server Pages", "ASP.NET", "B", "Babbage", "Bash", "BASIC", "bc", "BCPL", "BeanShell", "Batch (Windows/Dos)", "Bertrand", "BETA", "Bigwig", "Bistro", "BitC", "BLISS", "Blockly", "BlooP", "Blue", "Boo", "Boomerang", "Bourne shell (including bash and ksh)", "BREW", "BPEL", "B", "C--", "C++ – ISO/IEC 14882", "C# – ISO/IEC 23270", "C/AL", "Caché ObjectScript", "C Shell", "Caml", "Cayenne", "CDuce", "Cecil", "Cesil", "Céu", "Ceylon", "CFEngine", "CFML", "Cg", "Ch", "Chapel", "Charity", "Charm", "Chef", "CHILL", "CHIP-8", "chomski", "ChucK", "CICS", "Cilk", "Citrine (programming language)", "CL (IBM)", "Claire", "Clarion", "Clean", "Clipper", "CLIPS", "CLIST", "Clojure", "CLU", "CMS-2", "COBOL – ISO/IEC 1989", "CobolScript – COBOL Scripting language", "Cobra", "CODE", "CoffeeScript", "ColdFusion", "COMAL", "Combined Programming Language (CPL)", "COMIT", "Common Intermediate Language (CIL)", "Common Lisp (also known as CL)", "COMPASS", "Component Pascal", "Constraint Handling Rules (CHR)", "COMTRAN", "Converge", "Cool", "Coq", "Coral 66", "Corn", "CorVision", "COWSEL", "CPL", "CPL", "Cryptol", "csh", "Csound", "CSP", "CUDA", "Curl", "Curry", "Cybil", "Cyclone", "Cython", "Java", "Javascript", "M2001", "M4", "M#", "Machine code", "MAD (Michigan Algorithm Decoder)", "MAD/I", "Magik", "Magma", "make", "Maple", "MAPPER now part of BIS", "MARK-IV now VISION:BUILDER", "Mary", "MASM Microsoft Assembly x86", "MATH-MATIC", "Mathematica", "MATLAB", "Maxima (see also Macsyma)", "Max (Max Msp – Graphical Programming Environment)", "Maya (MEL)", "MDL", "Mercury", "Mesa", "Metafont", "Microcode", "MicroScript", "MIIS", "Milk (programming language)", "MIMIC", "Mirah", "Miranda", "MIVA Script", "ML", "Model 204", "Modelica", "Modula", "Modula-2", "Modula-3", "Mohol", "MOO", "Mortran", "Mouse", "MPD", "Mathcad", "MSIL – deprecated name for CIL", "MSL", "MUMPS", "Mystic Programming L"];
+
+                    var whitelist = {{tag_list|safe}};
 
                     var tagify = new Tagify(input, {
                         whitelist:whitelist,
@@ -128,9 +55,8 @@
                             enabled: 0,            
                             closeOnSelect: false   
                         }
-                        })
-                    </script>
-                <input name='input-custom-dropdown' class='tagify--custom-dropdown' placeholder='e.g., django, python, web development' required>
+                    })
+                </script>
             </div>
 
             <a href="/recruitment " class="button" >Cancel</a>
