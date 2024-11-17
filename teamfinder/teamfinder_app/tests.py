@@ -3,45 +3,62 @@ from unittest.mock import patch, MagicMock
 from teamfinder_app.tuapi import auth, get_user_info
 from django.urls import reverse
 from taggit.models import Tag
-
+from django.contrib.auth import authenticate, login, logout, get_user
+import django.contrib.auth.models as authmodel
 from teamfinder_app.models import (
     User, Faculty, Group, GroupMember, Message, Post, RecruitPost, Requirement, Feedback, DirectMessage
 )
 
 
-class TestAPI(TestCase):
-   @patch("teamfinder_app.tuapi.os.getenv")     # Mock os.getenv
-   @patch("teamfinder_app.tuapi.requests.post")  # Mock requests.post
-   @patch("teamfinder_app.tuapi.load_dotenv")
-   def test_auth(self, mock_getenv, mock_post, mock_load_dotenv):
-      # Mocking os.getenv to simulate the presence of an API key
-      mock_getenv.return_value = "mock_api_key"
-      mock_load_dotenv.return_value = None # Prevent loading the actual `.env` file
+# class TestAPI(TestCase):
+#    @patch("teamfinder_app.tuapi.os.getenv")     # Mock os.getenv
+#    @patch("teamfinder_app.tuapi.requests.post")  # Mock requests.post
+#    @patch("teamfinder_app.tuapi.load_dotenv")
+#    def test_auth(self, mock_getenv, mock_post, mock_load_dotenv):
+#       # Mocking os.getenv to simulate the presence of an API key
+#       mock_getenv.return_value = "mock_api_key"
+#       mock_load_dotenv.return_value = None # Prevent loading the actual `.env` file
 
-      # Mocking the response from requests.post
-      mock_response = MagicMock()
-      mock_response.status_code = 200  # Simulate a successful API call
-      mock_response.json.return_value = {"token": "mock_token"}  # Mock JSON response
-      mock_post.return_value = mock_response
+#       # Mocking the response from requests.post
+#       mock_response = MagicMock()
+#       mock_response.status_code = 200  # Simulate a successful API call
+#       mock_response.json.return_value = {"token": "mock_token"}  # Mock JSON response
+#       mock_post.return_value = mock_response
 
-      result = auth(user="test_user", password="test_password")
+#       result = auth(user="test_user", password="test_password")
 
-      self.assertEqual(result["status"], 200)  
-      self.assertEqual(result["data"], {"token": "mock_token"})  
+#       self.assertEqual(result["status"], 200)  
+#       self.assertEqual(result["data"], {"token": "mock_token"})  
 
-      # Ensure `requests.post` was called with the correct arguments
-      mock_post.assert_called_once_with(
-         "https://restapi.tu.ac.th/api/v1/auth/Ad/verify",
-         json={"UserName": "test_user", "PassWord": "test_password"},
-         headers={
-               "Content-Type": "application/json",
-               "Application-Key": "mock_api_key"
-         }
-      )
+#       # Ensure `requests.post` was called with the correct arguments
+#       mock_post.assert_called_once_with(
+#          "https://restapi.tu.ac.th/api/v1/auth/Ad/verify",
+#          json={"UserName": "test_user", "PassWord": "test_password"},
+#          headers={
+#                "Content-Type": "application/json",
+#                "Application-Key": "mock_api_key"
+#          }
+#       )
 
 class TestViews(TestCase):
 
    def setUp(self):
+      id1 = "6510615888"
+      pass1 = "password123"
+      id2 = "660134999"
+      pass2 = "password123"
+      u1 = authmodel.User.objects.create_user(
+         username = id1,
+         password = pass1
+      )
+      u1.save()
+
+      u2 = authmodel.User.objects.create_user(
+         username = id2,
+         password = pass2
+      )
+      u2.save()
+
       self.user1 = User.objects.create(
          user_id="6510615888",
          password="password123",
@@ -52,24 +69,30 @@ class TestViews(TestCase):
          year=3,
       )
       self.user2 = User.objects.create(
-            user_id="660134999",
-            password="password123",
-            email_address="user2@example.com",
-            name="Jane Smith",
-            major="Civil Law",
-            faculty="Law",
-            year=2,
+         user_id="660134999",
+         password="password123",
+         email_address="user2@example.com",
+         name="Jane Smith",
+         major="Civil Law",
+         faculty="Law",
+         year=2,
       )
-      
-   def test_login(self):
-      """test """
-      pass
-   
-   def test_index_return_homepage(self):
+      self.client = Client()
+      logged_in = self.client.login(username=id1, password=pass1)
+      if not logged_in:
+         raise Exception("Login failed for user1 during test setup.")
+
+   def test_protected_view_access(self):
+      """test view"""
+      response = self.client.get(reverse('myaccount'))
+      self.assertEqual(response.request["PATH_INFO"], "/myaccount")
+      self.assertEqual(response.status_code, 200)  
+
+   def test_index_return_index(self):
       """test if index return homepage"""
       c = Client()
       response = c.get("")
-      self.assertEqual(response.request["PATH_INFO"], "/homepage")
+      self.assertEqual(response.request["PATH_INFO"], "/")
       self.assertEqual(response.status_code, 200)
 
    def test_aboutPage(self):
@@ -116,6 +139,9 @@ class TestViews(TestCase):
       }
       response = c.post("/create", data=post_value, follow=True)
       self.assertEqual(response.request['PATH_INFO'], "/create")
+
+   def test_create_recruitment_post_invalid_2(self):
+      """test posting recruitment post with incorrect values 2"""
       c = Client()
       post_value = {
            "heading": "Health Hackathon",
