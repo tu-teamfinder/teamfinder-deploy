@@ -11,24 +11,22 @@
             <div class="blog-box">
                 <!--text-->
                 <div class="blog-box-text">
-                    <a href="#"> {{post.heading}} </a>
-                    <p> {{post.content}} <br></p>
                     <!--author-->
-                    <div class="blog-author">
+                    <div class="blog-author" >
                         <div class="blog-author-text">
-                            <strong> {{post.user}}</strong>
+                            <strong>{{post.user.name}}</strong>
                             <span> {{post.timestamp}}</span>
                         </div>
                     </div>
+                    <!--heading-->
+                    <a href="#"> {{post.heading}} </a>
+                    <p> {{post.content}} <br></p>
                 </div>
             </div>
             {% endfor %}
         </div>
     </section>
-    <div class="button" >
-        <a href="{% url 'create' %}" class="btn btn-warning" style="color:black;">Create Post</a>
-    </div>
+    <a href="{% url 'create' %}" class="round-button">✎</a>
 {% endblock %}
 
 
- 
