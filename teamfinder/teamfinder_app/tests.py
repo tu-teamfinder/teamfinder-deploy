@@ -1,8 +1,10 @@
 from django.test import TestCase, Client
 from unittest.mock import patch, MagicMock
 from teamfinder_app.tuapi import auth, get_user_info
+from taggit.models import Tag
+
 from teamfinder_app.models import (
-    User, Faculty, Group, GroupMember, Message, Post, RecruitPost, Requirement, Feedback
+    User, Faculty, Group, GroupMember, Message, Post, RecruitPost, Requirement, Feedback, DirectMessage
 )
 
 
@@ -36,7 +38,7 @@ class TestAPI(TestCase):
          }
       )
 
-class Test(TestCase):
+class TestViews(TestCase):
 
    def setUp(self):
       self.user1 = User.objects.create(
@@ -58,12 +60,10 @@ class Test(TestCase):
             year=2,
       )
       
-   
    def test_login(self):
       """test """
       pass
-      
-
+   
    def test_index_return_homepage(self):
       """test if index return homepage"""
       c = Client()
@@ -85,14 +85,49 @@ class Test(TestCase):
       self.assertEqual(response["Location"], "/recruitment")
       self.assertEqual(response.status_code, 200)
    
-   ## need further test
-   def test_create_recruitment_post(self):
-      """test posting recruitment post"""
+   def test_createPage(self):
+      """test if create recruitment post page working correctly"""
       c = Client()
       response = c.get("/create")
-      self.assertEqual(response["Location"], "/recruitment")
+      self.assertEqual(response["Location"], "/create")
       self.assertEqual(response.status_code, 200)
+   
+   def test_create_recruitment_post_valid(self):
+      """test posting recruitment post with correct values"""
+      c = Client()
+      post_value = {
+           "heading": "Health Hackathon",
+            "content": "Need experience devs",
+            "amount": 1,
+            "tags": "Machine Learning, Data Science, Kaggle"
+      }
+      response = c.post("/create", data=post_value, follow=True)
+      self.assertEqual(response.request['PATH_INFO'], "/create/requirement")
+   
+   def test_create_recruitment_post_invalid(self):
+      """test posting recruitment post with incorrect values"""
+      c = Client()
+      post_value = {
+           "heading": "Health Hackathon",
+            "content": "12312",
+            "amount": -10,
+            "tags": ",,"
+      }
+      response = c.post("/create", data=post_value, follow=True)
+      self.assertEqual(response.request['PATH_INFO'], "/create")
 
+   def test_create_recruitment_post_lack(self):
+      """test posting recruitment post with empty values"""
+      c = Client()
+      post_value = {
+           "heading": None,
+            "content": None,
+            "amount": None,
+            "tags": None
+      }
+      response = c.post("/create", data=post_value, follow=True)
+      self.assertEqual(response.request['PATH_INFO'], "/create")
+      
    def test_logout(self):
       """test if logout working correctly"""
       c = Client()
