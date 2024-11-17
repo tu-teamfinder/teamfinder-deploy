@@ -1,57 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Recruitment Post</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .form-container {
-            width: 50%;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            font-size: 0.9em;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'styles/create.css' %}">
 </head>
 <body>
-    <div class="form-container">
-        <h2>Create Recruitment Post</h2>
-
+    <div class="form-container mt-4">
+        <h2 style="color:white;">Create Recruitment Post</h2>
         <form method="POST" action="">
             {% csrf_token %}
 
@@ -79,8 +37,9 @@
                 <textarea id="description" name="description" rows="5" required></textarea>
             </div>
 
-            <button type="submit">Create Recruitment Post</button>
+            <button type="submit" class="button" style="background-color:#56cc9d;">Create Recruitment Post</button>
         </form>
     </div>
 </body>
 </html>
+{% endblock %}
