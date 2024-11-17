@@ -171,18 +171,31 @@ def web_post(request, post_id):
 
 #Create Post
 def create_post(request):
+    tag_list = [tag.name for tag in Tag.objects.all()]
+
     if request.method == 'POST':
         heading = request.POST.get('heading')
         content = request.POST.get('content')
-        amount = request.POST.get('amount')
-        tags = [tag.strip() for tag in request.POST.get('tag').split(',')]
+        amount = int(request.POST.get('amount'))
+        tags = [tag.strip() for tag in request.POST.get('tag').split(',') if tag.strip()]
+        tags_invalid = False
+        amount_invalid = False
 
         if len(tags) > 3:
+            tags_invalid = True
+
+        if amount > 50 or amount < 1:
+            amount_invalid = True
+
+        if tags_invalid or amount_invalid:
             context = {
                 "heading": heading,
                 "content": content,
                 "amount": amount,
-                "tags": tags
+                "tags": tags,
+                "tag_list": tag_list,
+                "tags_invalid": tags_invalid,
+                "amount_invalid": amount_invalid
             }
 
             return render(request, 'create.html', context)
@@ -195,7 +208,7 @@ def create_post(request):
 
         return redirect('/create/requirement')
 
-    return render(request, 'create.html')
+    return render(request, 'create.html', {"tag_list": tag_list})
 
 
 #Requirement
@@ -207,8 +220,8 @@ def web_requirement(request):
     tags = request.session.get('tags')
 
     if request.method == 'POST':
-        req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',')]
-        req_major = [major.strip() for major in request.POST.get('req_major').split(',')]
+        req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',') if faculty.strip()]
+        req_major = [major.strip() for major in request.POST.get('req_major').split(',') if major.strip()]
         year = request.POST.get('year')
         description = request.POST.get('description')
 

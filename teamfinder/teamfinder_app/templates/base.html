@@ -28,10 +28,18 @@
                 <a class="nav-link" href="#">Result</a>
               </li>
             </ul>
-            <button type="button" class="btn btn-danger me-sm-2" style="background-color: #ffd13f; font-weight:bold;">Team</button>
-            <a href="{% url 'myaccount' %}" class="btn btn-secondary">
-              <i class='bx bxs-user'></i>
-            </a>
+            <button type="button" class="btn btn-danger me-sm-2" style="background-color: #ffd13f;">Team</button>
+            
+            <div class="btn-group dropstart">
+              <button type="button" class="btn btn-secondary" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class='bx bxs-user'></i>
+              </button>
+              <div class="dropdown-menu">
+                  <a class="dropdown-item" href="{% url 'myaccount' %}">My Account</a>
+                  <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+              </div>
+          </div>
           </div>
         </div>
       </nav>
@@ -39,3 +47,4 @@
     {% block content %}{% endblock %}
     </body>
 </html>
+
