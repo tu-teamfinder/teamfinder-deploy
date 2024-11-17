@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from unittest.mock import patch, MagicMock
 from teamfinder_app.tuapi import auth, get_user_info
+from django.urls import reverse
 from taggit.models import Tag
 
 from teamfinder_app.models import (
@@ -9,10 +10,10 @@ from teamfinder_app.models import (
 
 
 class TestAPI(TestCase):
-
    @patch("teamfinder_app.tuapi.os.getenv")     # Mock os.getenv
    @patch("teamfinder_app.tuapi.requests.post")  # Mock requests.post
-   def test_auth(self, mock_getenv, mock_load_dotenv, mock_post):
+   @patch("teamfinder_app.tuapi.load_dotenv")
+   def test_auth(self, mock_getenv, mock_post, mock_load_dotenv):
       # Mocking os.getenv to simulate the presence of an API key
       mock_getenv.return_value = "mock_api_key"
       mock_load_dotenv.return_value = None # Prevent loading the actual `.env` file
@@ -68,28 +69,28 @@ class TestViews(TestCase):
       """test if index return homepage"""
       c = Client()
       response = c.get("")
-      self.assertEqual(response["Location"], "/homepage")
+      self.assertEqual(response.request["PATH_INFO"], "/homepage")
       self.assertEqual(response.status_code, 200)
-   
+
    def test_aboutPage(self):
       """test if about page working correctly"""
       c = Client()
       response = c.get("/about")
-      self.assertEqual(response["Location"], "/about")
+      self.assertEqual(response.request["PATH_INFO"], "/about")
       self.assertEqual(response.status_code, 200)
 
    def test_recruitmentPage(self):
       """test if recruitment page working correctly"""
       c = Client()
       response = c.get("/recruitment")
-      self.assertEqual(response["Location"], "/recruitment")
+      self.assertEqual(response.request["PATH_INFO"], "/recruitment")
       self.assertEqual(response.status_code, 200)
    
    def test_createPage(self):
       """test if create recruitment post page working correctly"""
       c = Client()
       response = c.get("/create")
-      self.assertEqual(response["Location"], "/create")
+      self.assertEqual(response.request["PATH_INFO"], "/create")
       self.assertEqual(response.status_code, 200)
    
    def test_create_recruitment_post_valid(self):
@@ -111,6 +112,15 @@ class TestViews(TestCase):
            "heading": "Health Hackathon",
             "content": "12312",
             "amount": -10,
+            "tags": "Machine Learning, Data Science, Kaggle, Stats"
+      }
+      response = c.post("/create", data=post_value, follow=True)
+      self.assertEqual(response.request['PATH_INFO'], "/create")
+      c = Client()
+      post_value = {
+           "heading": "Health Hackathon",
+            "content": "12312",
+            "amount": 0,
             "tags": ",,"
       }
       response = c.post("/create", data=post_value, follow=True)
@@ -120,17 +130,53 @@ class TestViews(TestCase):
       """test posting recruitment post with empty values"""
       c = Client()
       post_value = {
-           "heading": None,
-            "content": None,
-            "amount": None,
-            "tags": None
+           "heading": "",
+            "content": "",
+            "amount": "",
+            "tags": ""
       }
       response = c.post("/create", data=post_value, follow=True)
       self.assertEqual(response.request['PATH_INFO'], "/create")
-      
+
+   def test_create_requirement_valid(self):
+      """test input requirement with correct values"""
+      c = Client()
+      post_value = {
+          "req_faculty": "Engineering",
+          "req_major": "Computer Engineering",
+          "year": "2",
+          "description": "Web Developers"
+      }
+      response = c.post("/create/requirement", data=post_value, follow=True)
+      self.assertEqual(response.request['PATH_INFO'], "/recruitment")
+   
+   def test_create_requirement_invalid(self):
+      """test input requirement with incorrect values"""
+      c = Client()
+      post_value = {
+          "req_faculty": 123,
+          "req_major": "Chemical Engineering",
+          "year": "two",
+          "description": "AAAAAAAAAA"
+      }
+      response = c.post("/create/requirement", data=post_value, follow=True)
+      self.assertEqual(response.request['PATH_INFO'], "/create/requirement")
+   
+   def test_create_requirement_lack(self):
+      """test input requirement with empty values"""
+      c = Client()
+      post_value = {
+          "req_faculty": "",
+          "req_major": "",
+          "year": "",
+          "description": ""
+      }
+      response = c.post("/create/requirement", data=post_value, follow=True)
+      self.assertEqual(response.request['PATH_INFO'], "/create/requirement")
+   
    def test_logout(self):
       """test if logout working correctly"""
       c = Client()
       response = c.get("/logout")
-      self.assertEqual(response["Location"], "/login")
+      self.assertEqual(response.request["PATH_INFO"], "/login")
       self.assertEqual(response.status_code, 200)
