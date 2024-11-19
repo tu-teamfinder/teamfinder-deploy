@@ -4,14 +4,12 @@ from taggit.models import TagBase, GenericTaggedItemBase
 
 class User(models.Model):
     user_id = models.CharField(primary_key=True, max_length=32)
-    password = models.CharField(max_length=255)
     email_address = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     major = models.CharField(max_length=255)
     faculty = models.CharField(max_length=255)
     year = models.IntegerField()
     profile_image = models.ImageField(null=True, blank=True, default="fallback.png", upload_to="images/")
-
 
 class Faculty(TagBase):
     faculty = models.TextField()
@@ -79,7 +77,8 @@ class Requirement(models.Model):
     post = models.ForeignKey(RecruitPost, on_delete=models.CASCADE, related_name="requirements")
     req_faculty = TaggableManager(through=FacultyTag)
     req_major = TaggableManager(through=MajorTag)
-    year = models.CharField(max_length=10, blank=True)
+    year_min = models.IntegerField(default=1)
+    year_max = models.IntegerField(default=4)
     description = models.TextField()
 
 class Request(models.Model):

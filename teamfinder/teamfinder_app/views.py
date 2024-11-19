@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate, login, logout, get_user
 from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
+from django.db.models import Q
 import json
 # Create your views here.
 
@@ -35,7 +36,6 @@ def web_login(request):
             year = 67 - int(username[0:2]) + 1
 
             try: 
-                user_profile = User.objects.get(user_id=username)
                 user = authenticate(
                     request,
                     username=username,
@@ -58,7 +58,6 @@ def web_login(request):
                 if status == 200:
                     user_profile = User.objects.create(
                         user_id=username,
-                        password=password,
                         email_address=data["email"],
                         name=data["displayname_en"],
                         major=data["department"],
@@ -274,6 +273,19 @@ def web_requirement(request):
     request.session['visted_create'] = False
 
     return render(request, 'requirement.html', context)
+
+
+#Request
+@login_required(login_url="/login")
+def web_request(request):
+    user = User.objects.get(user_id=get_user(request))
+    faculty = user.faculty
+    major = user.major
+    year = user.year
+
+    requirements = Requirement.objects.filter(
+        Q(faculty__name__in=[faculty, 'all']) | Q(major__name__in=[major, 'all']) & Q(year="d")
+    ).distinct()
 
 
 #Team
