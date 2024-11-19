@@ -124,6 +124,7 @@ def web_logout(request):
 
 
 #Recruitment Post
+@login_required(login_url="/login")
 def recruitment(request):
     recruit_posts = RecruitPost.objects.filter(status=True)
 
@@ -139,6 +140,7 @@ def recruitment(request):
 
 
 #Result Post
+@login_required(login_url="/login")
 def result(request):
     result_posts = ResultPost.objects.all()
 
@@ -154,6 +156,7 @@ def result(request):
 
 
 #Post
+@login_required(login_url="/login")
 def web_post(request, post_id):
     post = Post.objects.filter(post_id=post_id).first()
 
@@ -174,6 +177,7 @@ def web_post(request, post_id):
 
 
 #Create Post
+@login_required(login_url="/login")
 def create_post(request):
     tag_list = [tag.name for tag in Tag.objects.all()]
 
@@ -219,6 +223,7 @@ def create_post(request):
 
 
 #Requirement
+@login_required(login_url="/login")
 def web_requirement(request):
     user = User.objects.get(user_id=get_user(request))
     heading = request.session.get('heading')
@@ -275,6 +280,7 @@ def web_requirement(request):
 
 
 #Team
+@login_required(login_url="/login")
 def team(request):
     user = User.objects.get(user_id=get_user(request))
     active = None
@@ -289,12 +295,14 @@ def team(request):
 
 
 #Finish
+@login_required(login_url="/login")
 def finish(request, post):
 
     return post_result(request, post)
 
 
 #Post result
+@login_required(login_url="/login")
 def post_result(request, post):
     if request.method == 'POST':
         user = User.objects.get(user_id=get_user(request))
@@ -326,6 +334,7 @@ def search(request, search_context):
 
 
 #Message
+@login_required(login_url="/login")
 def message_history(request, receiver):
     return render()
 
