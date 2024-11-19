@@ -190,9 +190,11 @@ def create_post(request):
 
         if len(tags) > 3:
             tags_invalid = True
+            messages.error(request, 'Only 3 tags can use')
 
         if amount > 50 or amount < 1:
             amount_invalid = True
+            messages.error(request, 'Can recruit 1 to 50')
 
         if tags_invalid or amount_invalid:
             context = {
@@ -238,7 +240,8 @@ def web_requirement(request):
     if request.method == 'POST':
         req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',') if faculty.strip()]
         req_major = [major.strip() for major in request.POST.get('req_major').split(',') if major.strip()]
-        year = request.POST.get('year')
+        min_year = request.POST.get('min_year')
+        max_year = request.POST.get('max_year')
         description = request.POST.get('description')
 
         post = Post.objects.create(
@@ -258,7 +261,8 @@ def web_requirement(request):
 
         requirement = Requirement.objects.create(
             post=recruit,
-            year=year,
+            min_year=min_year,
+            max_year=max_year,
             description=description
         )
         requirement.req_faculty.set(req_faculty)
@@ -277,14 +281,14 @@ def web_requirement(request):
 
 #Request
 @login_required(login_url="/login")
-def web_request(request):
+def web_request(request, post_id):
     user = User.objects.get(user_id=get_user(request))
     faculty = user.faculty
     major = user.major
     year = user.year
 
     requirements = Requirement.objects.filter(
-        Q(faculty__name__in=[faculty, 'all']) | Q(major__name__in=[major, 'all']) & Q(year="d")
+        Q(faculty__name__in=[faculty, 'all']) | Q(major__name__in=[major, 'all']) & Q(min_year__lte=year, max_year__gte=year)
     ).distinct()
 
 
@@ -353,3 +357,11 @@ def help(request):
     return render(request, 'help.html')
 
 
+# user = User.objects.get(user_id=get_user(request))
+#     faculty = user.faculty
+#     major = user.major
+#     year = user.year
+
+#     requirements = Requirement.objects.filter(
+#         Q(faculty__name__in=[faculty, 'all']) | Q(major__name__in=[major, 'all']) & Q(min_year__lte=year, max_year__gte=year)
+#     ).distinct()
