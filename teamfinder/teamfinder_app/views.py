@@ -12,7 +12,9 @@ import json
 
 #Homepage
 def homepage(request):
-    return render(request, 'homepage.html')
+    current_user = User.objects.all().count()
+
+    return render(request, 'homepage.html', {"current_user": current_user})
 
 
 #About
