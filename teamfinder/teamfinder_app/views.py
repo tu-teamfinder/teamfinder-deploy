@@ -28,63 +28,65 @@ def web_login(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
-        year = 67 - int(username[0:2]) + 1
 
-        try: 
-            user_profile = User.objects.get(user_id=username)
-            user = authenticate(
-                request,
-                username=username,
-                password=password
-            )
+        if username.isdigit():
+            year = 67 - int(username[0:2]) + 1
 
-            if user is not None:
-                login(request, user)
-                return redirect('/myaccount')
-
-        except User.DoesNotExist:
-            tu_response = tu.auth(
-                user=username,
-                password=password
-            )
-            
-            status = tu_response["status"]
-            data = tu_response["data"]
-
-            if status == 200:
-                user_profile = User.objects.create(
-                    user_id=username,
-                    password=password,
-                    email_address=data["email"],
-                    name=data["displayname_en"],
-                    major=data["department"],
-                    faculty=data["faculty"],
-                    year=year
-                )
-                user_profile.save()
-
-                faculty = Faculty.objects.get_or_create(
-                    name=data["faculty"], slug=data["faculty"], faculty=data["faculty"]
-                )
-
-                major = Major.objects.get_or_create(
-                    name=data["department"], slug=data["department"], major=data["department"]
-                )
-
-                create_user = authmodel.User.objects.create_user(
-                    username = username,
-                    password = password
-                )
-                create_user.save()
-
+            try: 
+                user_profile = User.objects.get(user_id=username)
                 user = authenticate(
                     request,
                     username=username,
                     password=password
                 )
 
-                login(request, user)
-                return redirect('/myaccount')
+                if user is not None:
+                    login(request, user)
+                    return redirect('/myaccount')
+
+            except User.DoesNotExist:
+                tu_response = tu.auth(
+                    user=username,
+                    password=password
+                )
+                
+                status = tu_response["status"]
+                data = tu_response["data"]
+
+                if status == 200:
+                    user_profile = User.objects.create(
+                        user_id=username,
+                        password=password,
+                        email_address=data["email"],
+                        name=data["displayname_en"],
+                        major=data["department"],
+                        faculty=data["faculty"],
+                        year=year
+                    )
+                    user_profile.save()
+
+                    faculty = Faculty.objects.get_or_create(
+                        name=data["faculty"], slug=data["faculty"], faculty=data["faculty"]
+                    )
+
+                    major = Major.objects.get_or_create(
+                        name=data["department"], slug=data["department"], major=data["department"]
+                    )
+
+                    create_user = authmodel.User.objects.create_user(
+                        username = username,
+                        password = password
+                    )
+                    create_user.save()
+
+                    user = authenticate(
+                        request,
+                        username=username,
+                        password=password
+                    )
+
+                    login(request, user)
+                    return redirect('/myaccount')
         
         messages.error(request, 'Invalid login')
 
