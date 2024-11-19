@@ -185,10 +185,7 @@ def create_post(request):
         heading = request.POST.get('heading')
         content = request.POST.get('content')
         amount = int(request.POST.get('amount'))
-        try:
-            tags = [tag["value"] for tag in json.loads(request.POST.get('tags'))]
-        except json.JSONDecodeError:
-            tags = []
+        tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
         tags_invalid = False
         amount_invalid = False
 
@@ -240,8 +237,8 @@ def web_requirement(request):
     }
 
     if request.method == 'POST':
-        req_faculty = [faculty["value"] for faculty in json.loads(request.POST.get('req_faculty'))]
-        req_major = [major["value"] for major in json.loads(request.POST.get('req_major'))]
+        req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',') if faculty.strip()]
+        req_major = [major.strip() for major in request.POST.get('req_major').split(',') if major.strip()]
         year = request.POST.get('year')
         description = request.POST.get('description')
 

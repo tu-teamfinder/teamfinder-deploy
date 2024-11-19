@@ -46,6 +46,7 @@
                     var whitelist = {{tag_list|safe}};
 
                     var tagify = new Tagify(input, {
+                        originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
                         whitelist:whitelist,
                         maxTags: 10,
                         dropdown: {
