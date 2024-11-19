@@ -4,7 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
-from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major
+from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major, Request
+from teamfinder_app.forms import RequestMessageForm
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
 from django.db.models import Q
@@ -282,14 +283,26 @@ def web_requirement(request):
 #Request
 @login_required(login_url="/login")
 def web_request(request, post_id):
-    user = User.objects.get(user_id=get_user(request))
-    faculty = user.faculty
-    major = user.major
-    year = user.year
+    if request.method == 'POST':
+        message = "ต้องการเข้าร่วมทีม"
+        form = RequestMessageForm(request.POST)
+        if form.is_valid():
+            message = form.cleaned_data['message']
+        
+        user = User.objects.get(user_id=get_user(request))
+        post = Post.objects.get(post_id=post_id)
+        requirement = Requirement.objects.get(post=post)
 
-    requirements = Requirement.objects.filter(
-        Q(faculty__name__in=[faculty, 'all']) | Q(major__name__in=[major, 'all']) & Q(min_year__lte=year, max_year__gte=year)
-    ).distinct()
+        a_request = Request.objects.create(
+            post=post,
+            user=user,
+            message=message,
+            requirement=requirement
+        )
+        a_request.save()
+
+        return redirect(f'/post/{post_id}')
+
 
 
 #Team
