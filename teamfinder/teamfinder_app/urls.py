@@ -11,5 +11,6 @@ urlpatterns = [
     path('myaccount', views.myaccount, name='myaccount'),
     path('create', views.create_post, name='create'),
     path('create/requirement', views.web_requirement, name='requirement'),
+    path('post/<post_id>', views.web_post, name='post'),
     path('recruitment', views.recruitment, name='recruitment'),
 ]

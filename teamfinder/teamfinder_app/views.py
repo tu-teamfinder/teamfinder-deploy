@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import django.contrib.auth.models as authmodel
 from django.contrib.auth import authenticate, login, logout, get_user
-from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major, Request
+from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major, Request, PostComment
 from teamfinder_app.forms import RequestMessageForm
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
@@ -159,18 +159,41 @@ def result(request):
 @login_required(login_url="/login")
 def web_post(request, post_id):
     post = Post.objects.filter(post_id=post_id).first()
-
     if post is None:
         return render(request, 'pagenotfound.html')
 
-    is_result = (ResultPost.objects.filter(post=post).first() is not None)
+    user = User.objects.get(user_id=get_user(request))
+    is_owner = post.user == user
+    is_recruit = (RecruitPost.objects.filter(post=post).first() is not None)
+    is_requested = Request.objects.filter(user=user, post=post).first()
+    status = False
+    
+    if is_recruit:
+        recruit = RecruitPost.objects.get(post=post)
+        status = recruit.status
+        requestable = False
+        
+        if status and not is_owner and not is_requested:
+            requirement = Requirement.objects.get(post=post)
+            faculty_check = user.faculty in [faculty.name for faculty in requirement.req_faculty.all()]
+            major_check = user.major in [major.name for major in requirement.req_major.all()]
+            year_check = user.year in list(range(requirement.year_min, requirement.year_max+1))
+            requestable = faculty_check | major_check & year_check
+
+    comments = PostComment.objects.filter(post=post).order_by('timestamp')
 
     context = {
+        "post_id": post_id,
         "user": post.user,
         "heading": post.heading,
         "content": post.content,
         "timestamp": post.timestamp,
-        "is_result": is_result
+        "is_owner": is_owner,
+        "is_recruit": is_recruit,
+        "status": status,
+        "requestable": requestable,
+        "is_requested": is_requested,
+        "comments": comments
     }
 
     return render(request, 'post.html', context)
@@ -238,7 +261,7 @@ def web_requirement(request):
         "major_list": major_list
     }
 
-    if request.method == 'POST':
+    if request.method == 'POST' and request.session.get('visted_create'):
         req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',') if faculty.strip()]
         req_major = [major.strip() for major in request.POST.get('req_major').split(',') if major.strip()]
         min_year = request.POST.get('min_year')
@@ -378,3 +401,9 @@ def help(request):
 #     requirements = Requirement.objects.filter(
 #         Q(faculty__name__in=[faculty, 'all']) | Q(major__name__in=[major, 'all']) & Q(min_year__lte=year, max_year__gte=year)
 #     ).distinct()
+# faculty_filter = Q(faculty__name__in=[user.faculty, 'all'])
+#             major_filter = Q(major__name__in=[user.major, 'all'])
+#             year_filter = Q(min_year__lte=user.year, max_year__gte=user.year)
+#             possible_requirements = Requirement.objects.filter(
+#                 faculty_filter | major_filter & year_filter
+#             ).distinct()
