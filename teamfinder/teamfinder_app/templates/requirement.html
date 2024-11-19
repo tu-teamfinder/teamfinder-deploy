@@ -6,51 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Recruitment Post</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
-    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>   
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .form-container {
-            width: 50%;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #007BFF;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .error {
-            color: red;
-            font-size: 0.9em;
-        }
-    </style>
-    <link rel="stylesheet" href="{% static 'styles/create.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+    <link rel="stylesheet" href="{% static 'styles/requirement.css' %}">
 </head>
 <body>
     <div class="form-container mt-4">
@@ -60,196 +17,20 @@
 
             <!-- Required Faculty -->
             <div class="form-group">
-                <label for="req_faculty">Required Faculty (comma-separated)</label>
+                <label for="req_faculty">Required Faculty</label>
                 <input id="req_faculty" name="req_faculty" placeholder="e.g., Computer Science, Engineering" required>
-                {% comment %} <script>
-                    var inputElm = document.querySelector('input[name=req_faculty]'),
-                        whitelist = {{faculty_list|safe}};
-
-
-                    // initialize Tagify on the above input node reference
-                    var tagify = new Tagify(inputElm, {
-                        enforceWhitelist: true,
-                    
-                        // make an array from the initial input value
-                        whitelist: inputElm.value.trim().split(/\s*,\s*/) 
-                    })
-
-                    // Chainable event listeners
-                    tagify.on('add', onAddTag)
-                        .on('remove', onRemoveTag)
-                        .on('input', onInput)
-                        .on('edit', onTagEdit)
-                        .on('invalid', onInvalidTag)
-                        .on('click', onTagClick)
-                        .on('focus', onTagifyFocusBlur)
-                        .on('blur', onTagifyFocusBlur)
-                        .on('dropdown:hide dropdown:show', e => console.log(e.type))
-                        .on('dropdown:select', onDropdownSelect)
-
-                    var mockAjax = (function mockAjax(){
-                        var timeout;
-                        return function(duration){
-                            clearTimeout(timeout); // abort last request
-                            return new Promise(function(resolve, reject){
-                                timeout = setTimeout(resolve, duration || 700, whitelist)
-                            })
-                        }
-                    })()
-
-                    // tag added callback
-                    function onAddTag(e){
-                        console.log("onAddTag: ", e.detail);
-                        console.log("original input value: ", inputElm.value)
-                        tagify.off('add', onAddTag) // exmaple of removing a custom Tagify event
-                    }
-
-                    // tag remvoed callback
-                    function onRemoveTag(e){
-                        console.log("onRemoveTag:", e.detail, "tagify instance value:", tagify.value)
-                    }
-
-                    // on character(s) added/removed (user is typing/deleting)
-                    function onInput(e){
-                        console.log("onInput: ", e.detail);
-                        tagify.settings.whitelist.length = 0; // reset current whitelist
-                        tagify.loading(true).dropdown.hide.call(tagify) // show the loader animation
-
-                        // get new whitelist from a delayed mocked request (Promise)
-                        mockAjax()
-                            .then(function(result){
-                                // replace tagify "whitelist" array values with new values
-                                // and add back the ones already choses as Tags
-                                tagify.settings.whitelist.push(...result, ...tagify.value)
-
-                                // render the suggestions dropdown.
-                                tagify.loading(false).dropdown.show.call(tagify, e.detail.value);
-                            })
-                    }
-
-                    function onTagEdit(e){
-                        console.log("onTagEdit: ", e.detail);
-                    }
-
-                    // invalid tag added callback
-                    function onInvalidTag(e){
-                        console.log("onInvalidTag: ", e.detail);
-                    }
-
-                    // invalid tag added callback
-                    function onTagClick(e){
-                        console.log(e.detail);
-                        console.log("onTagClick: ", e.detail);
-                    }
-
-                    function onTagifyFocusBlur(e){
-                        console.log(e.type, "event fired")
-                    }
-
-                    function onDropdownSelect(e){
-                        console.log("onDropdownSelect: ", e.detail)
-                    }
-                </script> {% endcomment %}
             </div>
 
             <!-- Required Major -->
             <div class="form-group">
-                <label for="req_major">Required Major (comma-separated)</label>
+                <label for="req_major">Required Major</label>
                 <input type="text" id="req_major" name="req_major" placeholder="e.g., Software Engineering, Data Science" required>
-                {% comment %} <script>
-                    var inputElm = document.querySelector('input[name=req_major]'),
-                        whitelist = {{major_list|safe}};
-
-
-                    // initialize Tagify on the above input node reference
-                    var tagify = new Tagify(inputElm, {
-                        enforceWhitelist: true,
-                    
-                        // make an array from the initial input value
-                        whitelist: inputElm.value.trim().split(/\s*,\s*/) 
-                    })
-
-                    // Chainable event listeners
-                    tagify.on('add', onAddTag)
-                        .on('remove', onRemoveTag)
-                        .on('input', onInput)
-                        .on('edit', onTagEdit)
-                        .on('invalid', onInvalidTag)
-                        .on('click', onTagClick)
-                        .on('focus', onTagifyFocusBlur)
-                        .on('blur', onTagifyFocusBlur)
-                        .on('dropdown:hide dropdown:show', e => console.log(e.type))
-                        .on('dropdown:select', onDropdownSelect)
-
-                    var mockAjax = (function mockAjax(){
-                        var timeout;
-                        return function(duration){
-                            clearTimeout(timeout); // abort last request
-                            return new Promise(function(resolve, reject){
-                                timeout = setTimeout(resolve, duration || 700, whitelist)
-                            })
-                        }
-                    })()
-
-                    // tag added callback
-                    function onAddTag(e){
-                        console.log("onAddTag: ", e.detail);
-                        console.log("original input value: ", inputElm.value)
-                        tagify.off('add', onAddTag) // exmaple of removing a custom Tagify event
-                    }
-
-                    // tag remvoed callback
-                    function onRemoveTag(e){
-                        console.log("onRemoveTag:", e.detail, "tagify instance value:", tagify.value)
-                    }
-
-                    // on character(s) added/removed (user is typing/deleting)
-                    function onInput(e){
-                        console.log("onInput: ", e.detail);
-                        tagify.settings.whitelist.length = 0; // reset current whitelist
-                        tagify.loading(true).dropdown.hide.call(tagify) // show the loader animation
-
-                        // get new whitelist from a delayed mocked request (Promise)
-                        mockAjax()
-                            .then(function(result){
-                                // replace tagify "whitelist" array values with new values
-                                // and add back the ones already choses as Tags
-                                tagify.settings.whitelist.push(...result, ...tagify.value)
-
-                                // render the suggestions dropdown.
-                                tagify.loading(false).dropdown.show.call(tagify, e.detail.value);
-                            })
-                    }
-
-                    function onTagEdit(e){
-                        console.log("onTagEdit: ", e.detail);
-                    }
-
-                    // invalid tag added callback
-                    function onInvalidTag(e){
-                        console.log("onInvalidTag: ", e.detail);
-                    }
-
-                    // invalid tag added callback
-                    function onTagClick(e){
-                        console.log(e.detail);
-                        console.log("onTagClick: ", e.detail);
-                    }
-
-                    function onTagifyFocusBlur(e){
-                        console.log(e.type, "event fired")
-                    }
-
-                    function onDropdownSelect(e){
-                        console.log("onDropdownSelect: ", e.detail)
-                    }
-                </script>             {% endcomment %}
             </div>
 
             <!-- Year Input -->
             <div class="form-group">
                 <label for="year">Year</label>
-                <input type="text" id="year" name="year" placeholder="e.g., 2024" required>
+                <input type="number" id="year" name="year" placeholder="1, 2, 3" required>
             </div>
 
             <!-- Description -->
@@ -263,4 +44,143 @@
     </div>
 </body>
 </html>
+<script>
+    var req_faculty = document.querySelector('input[name=req_faculty]'),
+        f_whitelist = {{faculty_list|safe}};
+
+    var req_major = document.querySelector('input[name=req_major]'), 
+        m_whitelist = {{major_list|safe}};
+
+
+    // initialize Tagify on the above input node reference
+    var f_tagify = new Tagify(req_faculty, {
+        enforceWhitelist: true,
+    
+        // make an array from the initial input value
+        whitelist: req_faculty.value.trim().split(/\s*,\s*/) 
+    })
+
+    var m_tagify = new Tagify(req_major, {
+        enforceWhitelist: true,
+    
+        whitelist: req_major.value.trim().split(/\s*,\s*/) 
+    })
+
+    // Chainable event listeners
+    f_tagify.on('add', onAddTagF)
+        .on('remove', onRemoveTagF)
+        .on('input', onInputF)
+        .on('edit', onTagEdit)
+        .on('invalid', onInvalidTag)
+        .on('click', onTagClick)
+        .on('focus', onTagifyFocusBlur)
+        .on('blur', onTagifyFocusBlur)
+        .on('dropdown:hide dropdown:show', e => console.log(e.type))
+        .on('dropdown:select', onDropdownSelect)
+
+    m_tagify.on('add', onAddTagM)
+        .on('remove', onRemoveTagM)
+        .on('input', onInputM)
+        .on('edit', onTagEdit)
+        .on('invalid', onInvalidTag)
+        .on('click', onTagClick)
+        .on('focus', onTagifyFocusBlur)
+        .on('blur', onTagifyFocusBlur)
+        .on('dropdown:hide dropdown:show', e => console.log(e.type))
+        .on('dropdown:select', onDropdownSelect)
+
+    var mockAjaxF = (function mockAjax(){
+        var timeout;
+        return function(duration){
+            clearTimeout(timeout); // abort last request
+            return new Promise(function(resolve, reject){
+                timeout = setTimeout(resolve, duration || 700, f_whitelist)
+            })
+        }
+    })()
+
+    var mockAjaxM = (function mockAjax(){
+        var timeout;
+        return function(duration){
+            clearTimeout(timeout);
+            return new Promise(function(resolve, reject){
+                timeout = setTimeout(resolve, duration || 700, m_whitelist)
+            })
+        }
+    })()
+
+    // tag added callback
+    function onAddTagF(e){
+        console.log("onAddTagF: ", e.detail);
+        console.log("original input value: ", req_faculty.value)
+        f_tagify.off('add', onAddTagF) // exmaple of removing a custom Tagify event
+    }
+
+
+    function onAddTagM(e){
+        console.log("onAddTagM: ", e.detail);
+        console.log("original input value: ", req_major.value)
+        m_tagify.off('add', onAddTagM)
+    }
+
+    // tag remvoed callback
+    function onRemoveTagF(e){
+        console.log("onRemoveTagF:", e.detail, "f_tagify instance value:", f_tagify.value)
+    }
+
+    function onRemoveTagM(e){
+        console.log("onRemoveTagM:", e.detail, "m_tagify instance value:", m_tagify.value)
+    }
+
+    // on character(s) added/removed (user is typing/deleting)
+    function onInputF(e){
+        console.log("onInputF: ", e.detail);
+        f_tagify.settings.whitelist.length = 0; // reset current whitelist
+        f_tagify.loading(true).dropdown.hide.call(f_tagify) // show the loader animation
+
+        // get new whitelist from a delayed mocked request (Promise)
+        mockAjaxF()
+            .then(function(result){
+                // replace f_tagify "whitelist" array values with new values
+                // and add back the ones already choses as Tags
+                f_tagify.settings.whitelist.push(...result, ...f_tagify.value)
+
+                // render the suggestions dropdown.
+                f_tagify.loading(false).dropdown.show.call(f_tagify, e.detail.value);
+            })
+    }
+        
+    function onInputM(e){
+        console.log("onInputM: ", e.detail);
+        m_tagify.settings.whitelist.length = 0; 
+        m_tagify.loading(true).dropdown.hide.call(m_tagify) 
+
+        mockAjaxM()
+            .then(function(result){
+                m_tagify.settings.whitelist.push(...result, ...m_tagify.value)
+                m_tagify.loading(false).dropdown.show.call(m_tagify, e.detail.value);
+            })
+    }
+
+    function onTagEdit(e){
+        console.log("onTagEdit: ", e.detail);
+    }
+    
+    function onInvalidTag(e){
+        console.log("onInvalidTag: ", e.detail);
+    }
+
+    function onTagClick(e){
+        console.log(e.detail);
+        console.log("onTagClick: ", e.detail);
+    }
+
+    function onTagifyFocusBlur(e){
+        console.log(e.type, "event fired")
+    }
+
+    function onDropdownSelect(e){
+        console.log("onDropdownSelect: ", e.detail)
+    }
+</script>
 {% endblock %}

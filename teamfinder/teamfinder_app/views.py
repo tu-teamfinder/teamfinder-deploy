@@ -235,10 +235,8 @@ def web_requirement(request):
     }
 
     if request.method == 'POST':
-        # req_faculty = [faculty["value"] for faculty in json.loads(request.POST.get('req_faculty'))]
-        # req_major = [major["value"] for major in json.loads(request.POST.get('req_major'))]
-        req_faculty = request.POST.get('req_faculty')
-        req_major = request.POST.get('req_major')
+        req_faculty = [faculty["value"] for faculty in json.loads(request.POST.get('req_faculty'))]
+        req_major = [major["value"] for major in json.loads(request.POST.get('req_major'))]
         year = request.POST.get('year')
         description = request.POST.get('description')
 
