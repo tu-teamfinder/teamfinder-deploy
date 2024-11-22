@@ -561,19 +561,3 @@ def message_history(request, receiver):
 #Help
 def help(request):
     return render(request, 'help.html')
-
-
-# user = User.objects.get(user_id=get_user(request))
-#     faculty = user.faculty
-#     major = user.major
-#     year = user.year
-
-#     requirements = Requirement.objects.filter(
-#         Q(faculty__name__in=[faculty, 'all']) | Q(major__name__in=[major, 'all']) & Q(min_year__lte=year, max_year__gte=year)
-#     ).distinct()
-# faculty_filter = Q(faculty__name__in=[user.faculty, 'all'])
-#             major_filter = Q(major__name__in=[user.major, 'all'])
-#             year_filter = Q(min_year__lte=user.year, max_year__gte=user.year)
-#             possible_requirements = Requirement.objects.filter(
-#                 faculty_filter | major_filter & year_filter
-#             ).distinct()
