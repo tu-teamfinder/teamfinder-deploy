@@ -216,6 +216,31 @@ def web_post(request, post_id):
     return render(request, 'post.html', context)
 
 
+#Comment
+@login_required(login_url="/login")
+def web_comment(request, post_id):
+    post = Post.objects.filter(post_id=post_id).first()
+    
+    if not post:
+        return render(request, 'pagenotfound.html', status=404)
+
+    if request.method == 'POST':
+        comment = request.POST.get('comment').strip() 
+
+        if comment: 
+            PostComment.objects.create(
+                post=post,
+                user=request.user,
+                comment=comment,
+                reaction=""
+            )
+
+        else:
+            messages.error(request, 'Please input something')
+
+    return redirect(f'/post/{post_id}')
+
+
 #Create Post
 @login_required(login_url="/login")
 def create_post(request):

@@ -23,5 +23,6 @@ urlpatterns = [
     path('feedback/<team_id>', views.feedback, name='feedback'),
     path('recruitment/search', views.search_recruit, name='search_recruit'),
     path('result/search', views.search_result, name='search_result'),
+    path('comment/<post_id>', views.web_comment, name='comment'),
     path('help', views.help, name='help'),
 ]
