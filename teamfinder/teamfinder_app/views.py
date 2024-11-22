@@ -3,9 +3,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model, get_user
-from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major, Request, PostComment
-from teamfinder_app.models import UserProfile
-from teamfinder_app.forms import RequestMessageForm, ImageUploadForm
+from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team
+from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
+from teamfinder_app.forms import RequestMessageForm, ImageUploadForm, FeedbackForm
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
 from django.db.models import Q
@@ -31,60 +31,68 @@ def web_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        if username.isdigit():
+        if username.isdigit() and len(username) == 10:
             # Extract year logic
             year = 67 - int(username[0:2]) + 1
 
             # First, try to authenticate with Django's User model
-            user = authenticate(request, username=username, password=password)
+            user = authenticate(
+                request, 
+                username=username, 
+                password=password
+            )
+
+            # If user is authenticated
             if user is not None:
                 login(request, user)
                 return redirect('/myaccount')
 
-            # If user is not found, try authenticating using the external API
-            try:
-                tu_response = tu.auth(user=username, password=password)
-                status = tu_response.get("status")
-                data = tu_response.get("data")
+            # If User does not exist
+            if User.objects.filter(user_id=username).first() == None:
+                # Try authenticating using the external API
+                try:
+                    tu_response = tu.auth(user=username, password=password)
+                    status = tu_response.get("status")
+                    data = tu_response.get("data")
 
-                if status == 200:
-                    # User doesn't exist, create them in Django
-                    user = User.objects.create_user(
-                        username=username,  # Use 'username' as the unique identifier
-                        password=password,
-                        email=data.get("email"),
-                        first_name=data.get("displayname_en"),
-                        major=data.get("department"),
-                        faculty=data.get("faculty"),
-                        year=year,
-                    )
+                    if status == 200:
+                        # User doesn't exist, create them in Django
+                        user = User.objects.create_user(
+                            username=username,  # Use 'username' as the unique identifier
+                            password=password,
+                            email=data.get("email"),
+                            first_name=data.get("displayname_en"),
+                            major=data.get("department"),
+                            faculty=data.get("faculty"),
+                            year=year,
+                        )
 
-                    user.save()
+                        user.save()
 
-                    # Create user profile
-                    UserProfile.objects.create(user=user)
+                        # Create user profile
+                        UserProfile.objects.create(user=user)
 
-                    # Handle faculty and major
-                    faculty = Faculty.objects.get_or_create(
-                        name=data["faculty"], slug=data["faculty"], faculty=data["faculty"]
-                    )
+                        # Handle faculty and major
+                        faculty = Faculty.objects.get_or_create(
+                            name=data["faculty"], slug=data["faculty"], faculty=data["faculty"]
+                        )
 
-                    major = Major.objects.get_or_create(
-                        name=data["department"], slug=data["department"], major=data["department"]
-                    )
+                        major = Major.objects.get_or_create(
+                            name=data["department"], slug=data["department"], major=data["department"]
+                        )
 
-                    # Log the user in
-                    user = authenticate(request, username=username, password=password)
-                    if user:
+                        # Log the user in
+                        user = authenticate(request, username=username, password=password)
                         login(request, user)
-                        return redirect('/myaccount')
-                    else:
-                        messages.error(request, 'Unable to authenticate user.')
-                else:
-                    messages.error(request, 'Authentication failed. Invalid credentials.')
-            except Exception as e:
-                messages.error(request, f'Error connecting to external service: {e}')
 
+                        return redirect('/myaccount')
+            
+                except Exception as e:
+                    messages.error(request, 'Error connecting to TU API')
+                    print(f"Error during TU API authentication: {e}")
+   
+            messages.error(request, 'Authentication failed. Invalid credentials.')
+        
         else:
             messages.error(request, 'Invalid username format.')
 
