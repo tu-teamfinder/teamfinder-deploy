@@ -163,18 +163,22 @@ def web_post(request, post_id):
     
     if request.method == 'POST':
         comment = request.POST.get('comment')
-        post_comment = PostComment.objects.create(
-            post=post,
-            user=user,
-            comment=comment,
-            reaction=""
-        )
-        post_comment.save()
+
+        if comment.strip():
+            post_comment = PostComment.objects.create(
+                post=post,
+                user=user,
+                comment=comment,
+                reaction=""
+            )
+            post_comment.save()
+
+        messages.error(request, 'Please fill something')
 
         return redirect(f'/post/{post_id}')
 
     if post is None:
-        return render(request, 'pagenotfound.html')
+        return render(request, 'pagenotfound.html', status=404)
 
     is_owner = post.user == user
     is_recruit = (RecruitPost.objects.filter(post=post).first() is not None)
@@ -222,26 +226,31 @@ def create_post(request):
         content = request.POST.get('content')
         amount = int(request.POST.get('amount'))
         tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
-        tags_invalid = False
-        amount_invalid = False
+        invalid = False
 
-        if len(tags) > 3:
-            tags_invalid = True
-            messages.error(request, 'Only 3 tags can use')
+        if not heading.strip():
+            invalid = True
+            messages.error(request, 'Please enter heading')
+
+        if not content.strip():
+            invalid = True
+            messages.error(request, 'Please enter content')
 
         if amount > 50 or amount < 1:
-            amount_invalid = True
-            messages.error(request, 'Can recruit 1 to 50')
+            invalid = True
+            messages.error(request, 'Can recruit 1 to 50')    
 
-        if tags_invalid or amount_invalid:
+        if len(tags) > 3:
+            invalid = True
+            messages.error(request, 'Only 3 tags can use')
+
+        if invalid:
             context = {
                 "heading": heading,
                 "content": content,
                 "amount": amount,
-                "tags": tags,
+                "tags": request.POST.get('tags'),
                 "tag_list": tag_list,
-                "tags_invalid": tags_invalid,
-                "amount_invalid": amount_invalid
             }
 
             return render(request, 'create.html', context)
@@ -280,6 +289,34 @@ def web_requirement(request):
         min_year = request.POST.get('min_year')
         max_year = request.POST.get('max_year')
         description = request.POST.get('description')
+        invalid = False
+
+        if len(req_faculty) == 0:
+            invalid = True
+            messages.error(request, 'At least 1 faculty')
+
+        if len(req_major) == 0:
+            invalid = True
+            messages.error(request, 'At least 1 major')
+
+        if min_year > max_year:
+            invalid = True
+            messages.error(request, 'min <= max')
+
+        if not description.strip():
+            invalid = True
+            messages.error(request, 'Put something in description')
+
+        if invalid:
+            context = {
+                "req_faculty": request.POST.get('req_faculty'),
+                "req_major": request.POST.get('req_major'),
+                "description": request.POST.get('description'),
+                "faculty_list": faculty_list,
+                "major_list": major_list
+            }
+
+            return render(request, 'create.html', context)
 
         post = Post.objects.create(
             user=user,
@@ -305,6 +342,8 @@ def web_requirement(request):
         requirement.req_faculty.set(req_faculty)
         requirement.req_major.set(req_major)
         requirement.save()
+
+        request.session.flush()
 
         return redirect('/recruitment')
     
@@ -370,12 +409,13 @@ def team(request, team_id):
     ]
     
     if user not in members:
-        return render(request, 'pagenotfound.html')
+        return render(request, 'pagenotfound.html', status=404)
 
     is_owner = team.team_leader == user
     is_finish = team.recruit_post.finish
 
     context = {
+        "team_id": team_id,
         "members": members,
         "is_owner": is_owner,
         "is_finish": is_finish
@@ -386,33 +426,73 @@ def team(request, team_id):
 
 #Finish
 @login_required(login_url="/login")
-def finish(request, post):
+def finish(request, team_id, is_post_result):
+    user = User.objects.get(user_id=get_user(request))
+    team = Team.objects.filter(team_id=team_id).first()
+    is_post_result = is_post_result.lower()
 
-    return post_result(request, post)
+    if (not team) or (user != team.team_leader) or (is_post_result not in ['yes', 'no']):
+        return render(request, 'pagenotfound.html', status=404)
+
+    post = team.recruit_post
+    post.finish = True
+    post.save()
+
+    recruit = RecruitPost.objects.filter(post=post).first()
+
+    if not recruit:
+        return render(request, 'pagenotfound.html', status=404)
+
+    recruit.delete()
+
+    if is_post_result == 'yes':
+        return redirect(f'/post_result/{post.post_id}')
+    
+    return redirect(f'/team/{team_id}')
 
 
 #Post result
 @login_required(login_url="/login")
-def post_result(request, post):
+def post_result(request, post_id):
+    post = Post.objects.filter(post_id=post_id).first()
+    result_post = ResultPost.objects.filter(post=post)
+    tag_list = [tag.name for tag in Tag.objects.all()]
+
+    if (not post) or result_post or (not post.finish):
+        return render(request, 'pagenotfound.html', status=404)
+
     if request.method == 'POST':
-        user = User.objects.get(user_id=get_user(request))
         heading = request.POST.get('heading')
         content = request.POST.get('content')
-        tag = None
+        tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
 
-        recruit = RecruitPost.objects.get(post=post)
-        recruit.delete()
+        if (not heading) or (not content) or (len(tags) == 0):
+            context = {
+                "heading": heading,
+                "content": content,
+                "tag_list": tag_list,
+            }
 
-        res = ResultPost.objects.create(
+            messages.error(request, 'Must fill every field')
+
+            return render(request, 'post_result.html', context)
+
+        post.heading = heading
+        post.content = content
+        post.save()
+
+        result_post = ResultPost.objects.create(
             post=post,
-            tag=tag
+            tag=tags
         )
+        result_post.save()
 
         return redirect('/result')
 
     context = {
         "heading": post.heading,
-        "content": post.content
+        "content": post.content,
+        "tag_list": tag_list,
     }
 
     return render(request, 'post_result.html', context)
