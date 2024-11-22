@@ -370,7 +370,7 @@ def web_request(request, post_id):
         if form.is_valid():
             message = form.cleaned_data['message']
         
-        user = User.objects.get(request.user)
+        user = request.user
         post = Post.objects.get(post_id=post_id)
         requirement = Requirement.objects.get(post=post)
 
@@ -505,8 +505,48 @@ def post_result(request, post_id):
 
 
 #Feedback
-def feedback(request):
-    ...
+@login_required(login_url="/login")
+def feedback(request, team_id):
+    user = request.user
+    team = Team.objects.filter(team_id=team_id).first()
+    members = [member.member for member in TeamMember.objects.filter(team=team) if member.member != user]
+    feedback_forms = {}
+
+    is_join_team = TeamMember.objects.filter(team=team, member=user).first()
+    is_finish = team.recruit_post.finish if team else False
+
+    if (not is_finish) or (not is_join_team) or (not team):
+        return render(request, 'pagenotfound.html', status=404)
+
+    if request.method == 'POST':
+        for member in members:
+            form = FeedbackForm(request.POST, prefix=f"feedback_{member.user_id}")
+            if form.is_valid():
+                feedback = Feedback.objects.create(
+                    reviewer=user,
+                    receiver=member,
+                    communication_pt=form.cleaned_data['communication_pt'],
+                    collaboration_pt=form.cleaned_data['collaboration_pt'],
+                    reliability_pt=form.cleaned_data['reliability_pt'],
+                    technical_pt=form.cleaned_data['technical_pt'],
+                    empathy_pt=form.cleaned_data['empathy_pt'],
+                    comment=form.cleaned_data['comment']
+                )
+                feedback.save()
+                
+        return redirect('/myaccount')
+    
+    for member in members:
+        feedback_form = FeedbackForm(prefix=f"feedback_{member.user_id}")
+        feedback_forms[member.user_id] = feedback_form
+
+    context = {
+        "user": user,
+        "feedback_forms": feedback_forms,
+        "members": members
+    }
+
+    return render(request, 'feedback.html', context)
 
 
 #Search-recruit no search by requirement
