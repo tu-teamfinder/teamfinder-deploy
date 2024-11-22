@@ -1,15 +1,28 @@
 from django.db import models
+from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from taggit.managers import TaggableManager
 from taggit.models import TagBase, GenericTaggedItemBase
 
-class User(models.Model):
+class User(AbstractUser):
     user_id = models.CharField(primary_key=True, max_length=32)
+    password = models.CharField(max_length=128)
     email_address = models.EmailField(unique=True)
     name = models.CharField(max_length=255)
     major = models.CharField(max_length=255)
     faculty = models.CharField(max_length=255)
     year = models.IntegerField()
-    profile_image = models.ImageField(null=True, blank=True, default="fallback.png", upload_to="images/")
+
+    def __str__(self):
+        return self.username
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
+    profile_image = models.ImageField(upload_to='images/', blank=True, null=True, default="fallback.png")
+    bio = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s Profile"
 
 class Faculty(TagBase):
     faculty = models.TextField()
