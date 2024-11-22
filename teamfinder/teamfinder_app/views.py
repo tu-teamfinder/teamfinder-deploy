@@ -2,29 +2,27 @@ import teamfinder_app.tuapi as tu
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-import django.contrib.auth.models as authmodel
-from django.contrib.auth import authenticate, login, logout, get_user
-from teamfinder_app.models import User, Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, Requirement, Faculty, Major, Request, PostComment
-from teamfinder_app.forms import RequestMessageForm, FeedbackForm
+from django.contrib.auth import authenticate, login, logout, get_user_model, get_user
+from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team
+from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
+from teamfinder_app.forms import RequestMessageForm, ImageUploadForm, FeedbackForm
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
 from django.db.models import Q
 import json
+
+User = get_user_model()
 # Create your views here.
 
 #Homepage
 def homepage(request):
-    current_user = User.objects.all().count()
-
+    current_user = User.objects.count()
     return render(request, 'homepage.html', {"current_user": current_user})
-
 
 #About
 def about(request):
     return render(request, 'about.html')
 
-
-#Login
 def web_login(request):
     if request.user.is_authenticated:
         return redirect('/myaccount')
@@ -33,72 +31,77 @@ def web_login(request):
         username = request.POST.get('username')
         password = request.POST.get('password')
 
-        if username.isdigit():
+        if username.isdigit() and len(username) == 10:
+            # Extract year logic
             year = 67 - int(username[0:2]) + 1
 
-            try: 
-                user = authenticate(
-                    request,
-                    username=username,
-                    password=password
-                )
+            # First, try to authenticate with Django's User model
+            user = authenticate(
+                request, 
+                username=username, 
+                password=password
+            )
 
-                if user is not None:
-                    login(request, user)
-                    return redirect('/myaccount')
+            # If user is authenticated
+            if user is not None:
+                login(request, user)
+                return redirect('/myaccount')
 
-            except User.DoesNotExist:
-                tu_response = tu.auth(
-                    user=username,
-                    password=password
-                )
-                
-                status = tu_response["status"]
-                data = tu_response["data"]
+            # If User does not exist
+            if User.objects.filter(user_id=username).first() == None:
+                # Try authenticating using the external API
+                try:
+                    tu_response = tu.auth(user=username, password=password)
+                    status = tu_response.get("status")
+                    data = tu_response.get("data")
 
-                if status == 200:
-                    user_profile = User.objects.create(
-                        user_id=username,
-                        email_address=data["email"],
-                        name=data["displayname_en"],
-                        major=data["department"],
-                        faculty=data["faculty"],
-                        year=year
-                    )
-                    user_profile.save()
+                    if status == 200:
+                        # User doesn't exist, create them in Django
+                        user = User.objects.create_user(
+                            username=username,  # Use 'username' as the unique identifier
+                            password=password,
+                            email=data.get("email"),
+                            first_name=data.get("displayname_en"),
+                            major=data.get("department"),
+                            faculty=data.get("faculty"),
+                            year=year,
+                        )
 
-                    faculty = Faculty.objects.get_or_create(
-                        name=data["faculty"], slug=data["faculty"], faculty=data["faculty"]
-                    )
+                        user.save()
 
-                    major = Major.objects.get_or_create(
-                        name=data["department"], slug=data["department"], major=data["department"]
-                    )
+                        # Create user profile
+                        UserProfile.objects.create(user=user)
 
-                    create_user = authmodel.User.objects.create_user(
-                        username = username,
-                        password = password
-                    )
-                    create_user.save()
+                        # Handle faculty and major
+                        faculty = Faculty.objects.get_or_create(
+                            name=data["faculty"], slug=data["faculty"], faculty=data["faculty"]
+                        )
 
-                    user = authenticate(
-                        request,
-                        username=username,
-                        password=password
-                    )
+                        major = Major.objects.get_or_create(
+                            name=data["department"], slug=data["department"], major=data["department"]
+                        )
 
-                    login(request, user)
-                    return redirect('/myaccount')
+                        # Log the user in
+                        user = authenticate(request, username=username, password=password)
+                        login(request, user)
+
+                        return redirect('/myaccount')
+            
+                except Exception as e:
+                    messages.error(request, 'Error connecting to TU API')
+                    print(f"Error during TU API authentication: {e}")
+   
+            messages.error(request, 'Authentication failed. Invalid credentials.')
         
-        messages.error(request, 'Invalid login')
+        else:
+            messages.error(request, 'Invalid username format.')
 
     return render(request, 'login.html')
-
 
 #My-account
 @login_required(login_url="/login")
 def myaccount(request):
-    user = User.objects.get(user_id=get_user(request))
+    user = request.user
     created_post = RecruitPost.objects.filter(post__user=user)
     current_joinedteams = TeamMember.objects.filter(member=user)
     current_leadteams = Team.objects.filter(team_leader=user)
@@ -116,6 +119,19 @@ def myaccount(request):
 
     return render(request, 'myaccount.html', context)
 
+#upload profile
+def upload_image(request):
+    profile = request.userprofile  
+
+    if request.method == 'POST':
+        form = ImageUploadForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            form.save()  # Save the updated UserProfile with the new image
+            return redirect('profile')  # Redirect to a success page or profile view
+    else:
+        form = ImageUploadForm(instance=profile)
+
+    return render(request, 'upload_image.html', {'form': form})
 
 #Logout
 def web_logout(request):
@@ -158,7 +174,7 @@ def result(request):
 #Post
 @login_required(login_url="/login")
 def web_post(request, post_id):
-    user = User.objects.get(user_id=get_user(request))
+    user = request.user
     post = Post.objects.filter(post_id=post_id).first()
 
     if post is None:
@@ -253,7 +269,7 @@ def create_post(request):
 #Requirement
 @login_required(login_url="/login")
 def web_requirement(request):
-    user = User.objects.get(user_id=get_user(request))
+    user = request.user
     heading = request.session.get('heading')
     content = request.session.get('content')
     amount = request.session.get('amount')
@@ -346,7 +362,7 @@ def web_request(request, post_id):
         if form.is_valid():
             message = form.cleaned_data['message']
         
-        user = User.objects.get(user_id=get_user(request))
+        user = request.user
         post = Post.objects.get(post_id=post_id)
         requirement = Requirement.objects.get(post=post)
 
@@ -364,7 +380,7 @@ def web_request(request, post_id):
 #Team
 @login_required(login_url="/login")
 def teams(request):
-    user = User.objects.get(user_id=get_user(request))
+    user = request.user
     active = Team.objects.filter(
         Q(teammember__member=user),
         recruit_post__finish=False
@@ -384,7 +400,7 @@ def teams(request):
 
 @login_required(login_url="/login")
 def team(request, team_id):
-    user = User.objects.get(user_id=get_user(request))
+    user = request.user
     team = Team.objects.get(team_id)
     members = [
         teammember.member for teammember in TeamMember.objects.filter(team=team)
@@ -409,7 +425,7 @@ def team(request, team_id):
 #Finish
 @login_required(login_url="/login")
 def finish(request, team_id, is_post_result):
-    user = User.objects.get(user_id=get_user(request))
+    user = request.user
     team = Team.objects.filter(team_id=team_id).first()
     is_post_result = is_post_result.lower()
 
@@ -483,7 +499,7 @@ def post_result(request, post_id):
 #Feedback
 @login_required(login_url="/login")
 def feedback(request, team_id):
-    user = User.objects.get(user_id=get_user(request))
+    user = request.user
     team = Team.objects.filter(team_id=team_id).first()
     members = [member.member for member in TeamMember.objects.filter(team=team) if member.member != user]
     feedback_forms = {}

@@ -14,6 +14,7 @@ urlpatterns = [
     path('post/<post_id>', views.web_post, name='post'),
     path('request/<post_id>', views.web_request, name='request'),
     path('recruitment', views.recruitment, name='recruitment'),
+    path('upload_image', views.upload_image, name='upload_image'),
     path('result', views.result, name='result'),
     path('teams', views.teams, name='teams'),
     path('team/<team_id>', views.team, name='team'),
