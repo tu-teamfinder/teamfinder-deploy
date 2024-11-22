@@ -19,7 +19,7 @@
                         </div>
                     </div>
                     <!--heading-->
-                    <a href="#"> {{post.heading}} </a>
+                    <a href="{% url 'post' post.post_id%}"> {{post.heading}} </a>
                     <p> {{post.content}} <br></p>
                 </div>
             </div>
