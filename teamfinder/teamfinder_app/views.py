@@ -286,8 +286,8 @@ def web_requirement(request):
     if request.method == 'POST' and request.session.get('visted_create'):
         req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',') if faculty.strip()]
         req_major = [major.strip() for major in request.POST.get('req_major').split(',') if major.strip()]
-        min_year = request.POST.get('min_year')
-        max_year = request.POST.get('max_year')
+        min_year = int(request.POST.get('min_year'))
+        max_year = int(request.POST.get('max_year'))
         description = request.POST.get('description')
         invalid = False
 
@@ -316,7 +316,7 @@ def web_requirement(request):
                 "major_list": major_list
             }
 
-            return render(request, 'create.html', context)
+            return render(request, 'requirement.html', context)
 
         post = Post.objects.create(
             user=user,
@@ -335,22 +335,20 @@ def web_requirement(request):
 
         requirement = Requirement.objects.create(
             post=recruit,
-            min_year=min_year,
-            max_year=max_year,
+            year_min=min_year,
+            year_max=max_year,
             description=description
         )
         requirement.req_faculty.set(req_faculty)
         requirement.req_major.set(req_major)
         requirement.save()
 
-        request.session.flush()
+        request.session['visted_create'] = False
 
         return redirect('/recruitment')
     
     elif not request.session.get('visted_create'):
         return redirect('/create')
-    
-    request.session['visted_create'] = False
 
     return render(request, 'requirement.html', context)
 
@@ -496,6 +494,11 @@ def post_result(request, post_id):
     }
 
     return render(request, 'post_result.html', context)
+
+
+#Feedback
+def feedback(request):
+    ...
 
 
 #Search-recruit no search by requirement
