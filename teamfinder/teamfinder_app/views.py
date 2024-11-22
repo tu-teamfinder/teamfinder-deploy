@@ -498,9 +498,58 @@ def post_result(request, post_id):
     return render(request, 'post_result.html', context)
 
 
-#Search
-def search(request, search_context):
-    return render()
+#Search-recruit no search by requirement
+def search_recruit(request):
+    if request.method == "POST":
+        search = request.POST.get('seacrh')
+
+        if search.strip():
+            search = [s.strip() for s in search.split(',') if s.strip()]
+            query = Q()
+
+            for tag in search:
+                query |= Q(tag__name__icontains=tag)
+
+            recruits = RecruitPost.objects.filter(query)
+
+            posts = []
+            for post in recruits:
+                posts.append(post.post)
+
+            context = {
+                "posts": posts,
+            }
+
+            return render(request, 'recruitment.html', context)
+
+    return redirect('/recruitment')
+
+
+#Search-result
+def search_result(request):
+    if request.method == "POST":
+        search = request.POST.get('seacrh')
+
+        if search.strip():
+            search = [s.strip() for s in search.split(',') if s.strip()]
+            query = Q()
+
+            for tag in search:
+                query |= Q(tag__name__icontains=tag)
+
+            results = ResultPost.objects.filter(query)
+
+            posts = []
+            for post in results:
+                posts.append(post.post)
+
+            context = {
+                "posts": posts,
+            }
+
+            return render(request, 'result.html', context)
+
+    return redirect('/result')
 
 
 #Message
