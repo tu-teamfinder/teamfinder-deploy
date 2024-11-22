@@ -158,11 +158,24 @@ def result(request):
 #Post
 @login_required(login_url="/login")
 def web_post(request, post_id):
+    user = User.objects.get(user_id=get_user(request))
     post = Post.objects.filter(post_id=post_id).first()
+    
+    if request.method == 'POST':
+        comment = request.POST.get('comment')
+        post_comment = PostComment.objects.create(
+            post=post,
+            user=user,
+            comment=comment,
+            reaction=""
+        )
+        post_comment.save()
+
+        return redirect(f'/post/{post_id}')
+
     if post is None:
         return render(request, 'pagenotfound.html')
 
-    user = User.objects.get(user_id=get_user(request))
     is_owner = post.user == user
     is_recruit = (RecruitPost.objects.filter(post=post).first() is not None)
     is_requested = Request.objects.filter(user=user, post=post).first()
@@ -327,17 +340,45 @@ def web_request(request, post_id):
         return redirect(f'/post/{post_id}')
 
 
-
 #Team
 @login_required(login_url="/login")
-def team(request):
+def teams(request):
     user = User.objects.get(user_id=get_user(request))
-    active = None
-    finished = None
+    active = Team.objects.filter(
+        Q(teammember__member=user),
+        recruit_post__finish=False
+    ).distinct()
+    finished = Team.objects.filter(
+        Q(teammember__member=user),
+        recruit_post__finish=True
+    ).distinct()
+    
+    context = {
+        "user": user,
+        "active": active,
+        "finished": finished
+    }
+
+    return render(request, 'teams.html', context)
+
+@login_required(login_url="/login")
+def team(request, team_id):
+    user = User.objects.get(user_id=get_user(request))
+    team = Team.objects.get(team_id)
+    members = [
+        teammember.member for teammember in TeamMember.objects.filter(team=team)
+    ]
+    
+    if user not in members:
+        return render(request, 'pagenotfound.html')
+
+    is_owner = team.team_leader == user
+    is_finish = team.recruit_post.finish
 
     context = {
-            "active": active,
-            "finished": finished
+        "members": members,
+        "is_owner": is_owner,
+        "is_finish": is_finish
     }
 
     return render(request, 'team.html', context)
