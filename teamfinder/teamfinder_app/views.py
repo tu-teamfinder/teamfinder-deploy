@@ -160,22 +160,6 @@ def result(request):
 def web_post(request, post_id):
     user = User.objects.get(user_id=get_user(request))
     post = Post.objects.filter(post_id=post_id).first()
-    
-    if request.method == 'POST':
-        comment = request.POST.get('comment')
-
-        if comment.strip():
-            post_comment = PostComment.objects.create(
-                post=post,
-                user=user,
-                comment=comment,
-                reaction=""
-            )
-            post_comment.save()
-
-        messages.error(request, 'Please fill something')
-
-        return redirect(f'/post/{post_id}')
 
     if post is None:
         return render(request, 'pagenotfound.html', status=404)
@@ -191,7 +175,7 @@ def web_post(request, post_id):
         requestable = False
         
         if status and not is_owner and not is_requested:
-            requirement = Requirement.objects.get(post=post)
+            requirement = Requirement.objects.get(post=recruit)
             faculty_check = user.faculty in [faculty.name for faculty in requirement.req_faculty.all()]
             major_check = user.major in [major.name for major in requirement.req_major.all()]
             year_check = user.year in list(range(requirement.year_min, requirement.year_max+1))
