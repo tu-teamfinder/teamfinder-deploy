@@ -13,4 +13,5 @@ urlpatterns = [
     path('create/requirement', views.web_requirement, name='requirement'),
     path('post/<post_id>', views.web_post, name='post'),
     path('recruitment', views.recruitment, name='recruitment'),
+    path('upload_image', views.upload_image, name='upload_image'),
 ]
