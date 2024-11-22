@@ -166,7 +166,7 @@ def result(request):
 #Post
 @login_required(login_url="/login")
 def web_post(request, post_id):
-    user = User.objects.get(request.user)
+    user = request.user
     post = Post.objects.filter(post_id=post_id).first()
     
     if request.method == 'POST':
@@ -277,7 +277,7 @@ def create_post(request):
 #Requirement
 @login_required(login_url="/login")
 def web_requirement(request):
-    user = User.objects.get(request.user)
+    user = request.user
     heading = request.session.get('heading')
     content = request.session.get('content')
     amount = request.session.get('amount')
@@ -388,7 +388,7 @@ def web_request(request, post_id):
 #Team
 @login_required(login_url="/login")
 def teams(request):
-    user = User.objects.get(request.user)
+    user = request.user
     active = Team.objects.filter(
         Q(teammember__member=user),
         recruit_post__finish=False
@@ -408,7 +408,7 @@ def teams(request):
 
 @login_required(login_url="/login")
 def team(request, team_id):
-    user = User.objects.get(request.user)
+    user = request.user
     team = Team.objects.get(team_id)
     members = [
         teammember.member for teammember in TeamMember.objects.filter(team=team)
@@ -433,7 +433,7 @@ def team(request, team_id):
 #Finish
 @login_required(login_url="/login")
 def finish(request, team_id, is_post_result):
-    user = User.objects.get(request.user)
+    user = request.user
     team = Team.objects.filter(team_id=team_id).first()
     is_post_result = is_post_result.lower()
 
