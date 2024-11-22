@@ -1,37 +1,41 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block content %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Post</title>
+{%block title%} Create Post{%endblock%}
+{%block head%}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>   
     <link rel="stylesheet" href="{% static 'styles/create.css' %}">
-</head>
-<body>
+{%endblock%}
+
+{% block content %}
+
     <div class="form-container mt-4">
         <h1 style="color: white; font-weight:0;">Create a Post</h1>
 
         <!-- Display a warning if there are too many tags -->
-
+        {% if messages %}
+        <div class="alert alert-dismissible alert-danger">
+            {% for message in messages %}
+                {{ message }}.<br>
+            {% endfor %}
+        </div>
+        {% endif %}
         <form method="POST" action="">
             {% csrf_token %}
             <div class="form-group">
                 <label for="heading" style="font-weight:0;">Heading</label>
-                <input type="text" id="heading" name="heading" value="{{ heading|default:'' }}" required>
+                <input type="text" id="heading" name="heading" value="{{ heading|default:'' }}">
             </div>
 
             <div class="form-group">
                 <label for="content">Content</label>
-                <textarea id="content" name="content" rows="5" required>{{ content|default:'' }}</textarea>
+                <textarea id="content" name="content" rows="5" >{{ content|default:'' }}</textarea>
             </div>
 
             <div class="form-group">
                 <label for="amount">Amount</label>
-                <input type="number" id="amount" name="amount" value="{{ amount|default:'' }}" required>
+                <input type="number" id="amount" name="amount" required value="{{ amount|default:'1' }}" >
             </div>
-
             <div class="form-group">
                 <label for="tag">Tags</label>
                 <input name='tags' class='tag_input' placeholder='write some tags' value=''>
@@ -56,6 +60,4 @@
             <button type="submit" class="button">Next</button>
         </form>
     </div>
-</body>
-</html>
 {% endblock %}

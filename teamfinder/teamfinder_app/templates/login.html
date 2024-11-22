@@ -6,9 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'styles/login.css' %}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="{% static 'styles/bootstrap.css' %}">
 </head>
 <body>
+    <!-- Calling messages framework -->
+
     <div class="wrapper">
+        {% if messages %}
+    <div class="alert alert-dismissible alert-danger">
+        {% for message in messages %}
+              {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
         <form method="POST" action="{% url 'login' %}">
             {% csrf_token %}  
             <h1>Team Finder</h1>
