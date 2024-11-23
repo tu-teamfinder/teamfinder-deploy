@@ -8,8 +8,9 @@ from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Requ
 from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
-from django.db.models import Q
+from django.db.models import Q, Avg
 import json
+
 
 User = get_user_model()
 # Create your views here.
@@ -128,17 +129,6 @@ def myaccount(request):
     }
     return render(request, 'myaccount.html', context)
 
-# def upload_profile_image(request):
-# if request.method == 'POST':
-#     form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
-#     if form.is_valid():
-#         form.save()  # Save the updated UserProfile with the new image
-#         return redirect('/myaccount')  
-# else:
-#         form = ProfileImageUploadForm(instance=request.user.profile)
-
-# return render(request, 'myaccount.html', {'form': form})
-
 #upload profile
 @login_required(login_url="/login")
 def upload_profile_image(request):
@@ -148,7 +138,7 @@ def upload_profile_image(request):
             form.save()  # Save the updated UserProfile with the new image
             return redirect('/myaccount')  
     else:
-         form = ProfileImageUploadForm(instance=request.user.profile)
+        form = ProfileImageUploadForm(instance=request.user.profile)
 
     return render(request, 'myaccount.html', {'form': form})
 
@@ -156,6 +146,28 @@ def upload_profile_image(request):
 def web_logout(request):
     logout(request)
     return redirect('/login')
+
+@login_required(login_url="/login")
+def my_stats(request):
+    user = request.user
+    feedback_set = Feedback.objects.filter(receiver=user)
+    labels = ['communication', 'collaboration', 'reliability', 'technical', 'empathy']
+    if Feedback.objects.count() != 0:
+        average_communication = Feedback.objects.filter(receiver=user).aggregate(Avg('communication_pt'))
+        average_collaboration = Feedback.objects.filter(receiver=user).aggregate(Avg('collaboration_pt'))
+        average_reliability = Feedback.objects.filter(receiver=user).aggregate(Avg('reliability_pt'))
+        average_technical = Feedback.objects.filter(receiver=user).aggregate(Avg('technical_pt'))
+        average_empathy = Feedback.objects.filter(receiver=user).aggregate(Avg('empathy_pt'))
+        dataset1 = [average_communication['communication_pt__avg'], average_collaboration['collaboration_pt__avg'], 
+                    average_reliability['reliability_pt__avg'], average_technical['technical_pt__avg'], average_empathy['empathy_pt__avg']]
+    else:
+        dataset1 = None
+    context = {
+        "feedback": feedback_set,
+        'labels': json.dumps(labels),
+        'dataset1': json.dumps(dataset1),
+    }
+    return render(request, 'mystats.html', context)
 
 
 #Recruitment Post
