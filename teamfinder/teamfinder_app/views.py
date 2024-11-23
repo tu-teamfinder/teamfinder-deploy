@@ -14,6 +14,19 @@ import json
 User = get_user_model()
 # Create your views here.
 
+def is_requestable(user, post_id):
+    recruit = RecruitPost.objects.filter(post_id=post_id).first()
+    if not recruit or not recruit.status:
+        return False
+    
+    requirement = Requirement.objects.get(post=recruit)
+    faculty_check = user.faculty in [faculty.name for faculty in requirement.req_faculty.all()]
+    major_check = user.major in [major.name for major in requirement.req_major.all()]
+    year_check = user.year in list(range(requirement.year_min, requirement.year_max+1))
+    requestable = faculty_check | major_check & year_check
+
+    return requestable
+
 #Homepage
 def homepage(request):
     current_user = User.objects.count()
@@ -203,18 +216,14 @@ def web_post(request, post_id):
     is_recruit = (RecruitPost.objects.filter(post=post).first() is not None)
     is_requested = Request.objects.filter(user=user, post=post).first()
     status = False
+    requestable = False
     
     if is_recruit:
         recruit = RecruitPost.objects.get(post=post)
         status = recruit.status
-        requestable = False
         
         if status and not is_owner and not is_requested:
-            requirement = Requirement.objects.get(post=recruit)
-            faculty_check = user.faculty in [faculty.name for faculty in requirement.req_faculty.all()]
-            major_check = user.major in [major.name for major in requirement.req_major.all()]
-            year_check = user.year in list(range(requirement.year_min, requirement.year_max+1))
-            requestable = faculty_check | major_check & year_check
+            requestable = is_requestable(user, post_id)
 
     comments = PostComment.objects.filter(post=post).order_by('timestamp')
 
@@ -263,6 +272,7 @@ def web_comment(request, post_id):
 #Create Post
 @login_required(login_url="/login")
 def create_post(request):
+    request.session['visited_create'] = False
     tag_list = [tag.name for tag in Tag.objects.all()]
 
     if request.method == 'POST':
@@ -303,7 +313,7 @@ def create_post(request):
         request.session['content'] = content
         request.session['amount'] = amount
         request.session['tags'] = tags
-        request.session['visted_create'] = True
+        request.session['visited_create'] = True
 
         return redirect('/create/requirement')
 
@@ -327,7 +337,7 @@ def web_requirement(request):
         "major_list": major_list
     }
 
-    if request.method == 'POST' and request.session.get('visted_create'):
+    if request.method == 'POST' and request.session.get('visited_create'):
         req_faculty = [faculty.strip() for faculty in request.POST.get('req_faculty').split(',') if faculty.strip()]
         req_major = [major.strip() for major in request.POST.get('req_major').split(',') if major.strip()]
         min_year = int(request.POST.get('min_year'))
@@ -387,11 +397,14 @@ def web_requirement(request):
         requirement.req_major.set(req_major)
         requirement.save()
 
-        request.session['visted_create'] = False
+        team = Team.objects.create(team_leader=user)        
+        TeamMember.objects.create(team=team, member=user)
+
+        request.session['visited_create'] = False
 
         return redirect('/recruitment')
     
-    elif not request.session.get('visted_create'):
+    elif not request.session.get('visited_create'):
         return redirect('/create')
 
     return render(request, 'requirement.html', context)
@@ -400,7 +413,7 @@ def web_requirement(request):
 #Request
 @login_required(login_url="/login")
 def web_request(request, post_id):
-    if request.method == 'POST':
+    if request.method == 'POST' and is_requestable(request.user, post_id):
         message = "ต้องการเข้าร่วมทีม"
         form = RequestMessageForm(request.POST)
         if form.is_valid():
@@ -408,7 +421,9 @@ def web_request(request, post_id):
         
         user = request.user
         post = Post.objects.get(post_id=post_id)
-        requirement = Requirement.objects.get(post=post)
+        requirement = Requirement.objects.get(
+            post=RecruitPost.objects.get(post=post)
+        )
 
         a_request = Request.objects.create(
             post=post,
@@ -419,6 +434,8 @@ def web_request(request, post_id):
         a_request.save()
 
         return redirect(f'/post/{post_id}')
+    
+    return redirect('/')
 
 
 #Team
@@ -445,7 +462,7 @@ def teams(request):
 @login_required(login_url="/login")
 def team(request, team_id):
     user = request.user
-    team = Team.objects.get(team_id)
+    team = Team.objects.get(team_id=team_id)
     members = [
         teammember.member for teammember in TeamMember.objects.filter(team=team)
     ]
@@ -481,10 +498,6 @@ def finish(request, team_id, is_post_result):
     post.save()
 
     recruit = RecruitPost.objects.filter(post=post).first()
-
-    if not recruit:
-        return render(request, 'pagenotfound.html', status=404)
-
     recruit.status = False
     recruit.save()
 
@@ -498,10 +511,10 @@ def finish(request, team_id, is_post_result):
 @login_required(login_url="/login")
 def post_result(request, post_id):
     post = Post.objects.filter(post_id=post_id).first()
-    result_post = ResultPost.objects.filter(post=post)
+    result_post = ResultPost.objects.filter(post=post).first()
     tag_list = [tag.name for tag in Tag.objects.all()]
 
-    if (not post) or result_post or (not post.finish):
+    if (not post) or result_post or (not post.finish) or (post.user != request.user):
         return render(request, 'pagenotfound.html', status=404)
 
     if request.method == 'POST':
@@ -551,8 +564,9 @@ def feedback(request, team_id):
 
     is_join_team = TeamMember.objects.filter(team=team, member=user).first()
     is_finish = team.recruit_post.finish if team else False
+    is_feedbacked = Feedback.objects.filter(team=team).first() #in case that only feedback 1 user
 
-    if (not is_finish) or (not is_join_team) or (not team):
+    if (not is_finish) or (not is_join_team) or (not team) or is_feedbacked:
         return render(request, 'pagenotfound.html', status=404)
 
     if request.method == 'POST':
