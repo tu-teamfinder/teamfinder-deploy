@@ -1,23 +1,32 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Myaccount{% endblock %}
 {% block content %}
-
-<div class="profile">
-    <h2>{{userdata.name}}'s Profile</h2>
-    {% if user.profile.profile_image %}
-        <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s Profile Picture" style="width: 150px; height: 150px;">
-    {% else %}
-        <img src="/media/images/fallback.png" alt="Default Profile Picture" style="width: 150px; height: 150px;">
-    {% endif %}
-    <h2>{{userdata.faculty}}</h2>
-    <h2>{{userdata.major}}</h2>
-
+<link rel="stylesheet" href="{% static 'styles/myaccount.css' %}">
+<style>
+    #id_profile_image {
+    display: none;
+}
+</style>
+<div class="profile-container">
+    <div class="profile-box">
+        {% if user.profile.profile_image %}
+            <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s Profile Picture" class="profile-pic">
+        {% else %}
+            <img src="/media/images/fallback.png" alt="Default Profile Picture" class="profile-pic">
+        {% endif %}
+        <h2>{{userdata.name}}'s Profile</h2>
+        <h3>{{userdata.faculty}}</h3>
+        <h3>{{userdata.major}}</h3>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="id_profile_image" class="btn btn-primary">Upload Image</label>
+            {{ form.profile_image }}
+            <button type="submit" class="btn btn-primary">Update Image</button>
+          </form>
+        <a href="#" class="btn btn-primary">Stats</a>
+    </div>
 </div>
-
-<h2>Upload Profile Picture</h2>
-<form method="post" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-primary">Upload</button>
-</form>
 
 {% endblock %}
