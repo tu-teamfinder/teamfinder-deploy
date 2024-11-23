@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+{%block title%}Post{%endblock%}
+{%block head%}
+{%endblock%}
+<style>
+    .btn{
+        bottom: 20%;
+        right: 20%;
+        position: fixed;
+    }
+</style>
+{% block content %}
+<div class="container">
+<div class="card text-white bg-dark m-25 mt-5 mb-5" style="">
+    <div class="card-header">{{heading}}</div>
+    <div class="card-body">
+      <h4 class="card-title">{{heading}}</h4>
+      <p class="card-text">{{content}}</p>
+    </div>
+</div>
+</div>
+<section>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-5 col-md-6 col-12 pb-4">
+                <h1>Comments</h1>
+                {% for comment in comments%}
+                <div class="card border-dark mt-4 text-justify float-left">
+                    <h4 style="display: inline;">{{comment.user.name}}</h4>
+                    <span>{{comment.timestamp}}</span>
+                    <br>
+                    <p>{{comment.comment}}</p>
+                </div>
+                {%endfor%}
+            </div>
+            <div class="col-lg-4 col-md-5 col-sm-4 offset-md-1 offset-sm-1 col-12 mt-4">
+                <form method="POST" action="">
+                    {% csrf_token %}
+                    <div class="form-group mb-5">
+                        <h4>Leave a comment</h4>
+                        <label for="message">Message</label>
+                        <textarea name='comment' id="comment" msg cols="30" rows="5" class="form-control" style="background-color: white;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <button type="summit" class="btn btn-secondary">Post Comment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal" id="Modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Request Form</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+
+            <form method='POST' action="{% url 'request' post_id%}">
+            {%csrf_token%}
+            <textarea class = "form-control" id="message" name="message" rows="5" >{{ message|default:'' }}</textarea>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Send Request</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+{%if not is_owner%}
+<div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
+    Request
+  </button></div>
+{%endif%}
+{%if is_owner%}
+<div style="bottom: 10%; right: 10%; position:fixed;"><a href='#' class="btn btn-primary">Status</a></div>
+{%endif%}
+{%endblock%}
