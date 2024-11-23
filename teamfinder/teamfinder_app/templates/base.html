@@ -10,7 +10,13 @@
     <link rel="stylesheet" href="{% static 'styles/base.css' %}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     {% block head%} {%endblock%}
+    <style> 
+      .dropdown-toggle::after { 
+          content: none; 
+      } 
+  </style> 
 </head>
+
 <body style="background-color: #f9f8ff;">
     <nav class="navbar navbar-expand-lg" style="background-color: #c3002f;" data-bs-theme="dark">
         <div class="container-fluid">
@@ -33,21 +39,22 @@
                 <button class="nav-link" id="openSidebar">Chat</button>
               </li>
             </ul>
+
             <button type="button" class="btn btn-danger me-sm-2" style="background-color: #ffd13f;">Team</button>
             
-            <div class="btn-group dropstart">
-              <button type="button" class="btn btn-secondary" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <div class="dropdown dropstart">
+              <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class='bx bxs-user'></i>
               </button>
-              <div class="dropdown-menu">
-                  <a class="dropdown-item" href="{% url 'myaccount' %}">My Account</a>
-                  <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
-              </div>
-          </div>
+              <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="{% url 'myaccount' %}">My Account</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{% url 'logout' %}">Logout</a></li>
+              </ul>
+            </div>
           </div>
         </div>
-      </nav>
+    </nav>
       <div id="sidebar" class="sidebar">
         <button id="closeSidebar" class="close-btn">×</button>
         <ul>
