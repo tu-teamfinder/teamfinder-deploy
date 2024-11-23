@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="{% static 'styles/base.css' %}">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     {% block head%} {%endblock%}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style> 
       .dropdown-toggle::after { 
           content: none; 
@@ -40,7 +41,7 @@
               </li>
             </ul>
 
-            <button type="button" class="btn btn-danger me-sm-2" style="background-color: #ffd13f;">Team</button>
+            <a class="btn btn-danger me-sm-2" style="background-color: #ffd13f;" href="{% url 'teams' %}">Team</a>
             
             <div class="dropdown dropstart">
               <button class="btn btn-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
