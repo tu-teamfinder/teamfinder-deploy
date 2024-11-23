@@ -530,8 +530,8 @@ def post_result(request, post_id):
         return render(request, 'pagenotfound.html', status=404)
 
     if request.method == 'POST':
-        heading = request.POST.get('heading')
-        content = request.POST.get('content')
+        heading = request.POST.get('heading').strip()
+        content = request.POST.get('content').strip()
         tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
 
         if (not heading) or (not content) or (len(tags) == 0):
