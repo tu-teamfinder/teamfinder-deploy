@@ -466,7 +466,8 @@ def finish(request, team_id, is_post_result):
     if not recruit:
         return render(request, 'pagenotfound.html', status=404)
 
-    recruit.delete()
+    recruit.status = False
+    recruit.save()
 
     if is_post_result == 'yes':
         return redirect(f'/post_result/{post.post_id}')
@@ -542,6 +543,7 @@ def feedback(request, team_id):
                 feedback = Feedback.objects.create(
                     reviewer=user,
                     receiver=member,
+                    team=team,
                     communication_pt=form.cleaned_data['communication_pt'],
                     collaboration_pt=form.cleaned_data['collaboration_pt'],
                     reliability_pt=form.cleaned_data['reliability_pt'],
