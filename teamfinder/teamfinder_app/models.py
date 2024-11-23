@@ -132,8 +132,10 @@ class TeamMember(models.Model):
 
 class Feedback(models.Model):
     feedback_id = models.AutoField(primary_key=True)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_feedbacks')
     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_feedbacks')
+    team = models.ForeignKey(Team, on_delete=models.CASCADE)
     communication_pt = models.IntegerField()
     collaboration_pt = models.IntegerField()
     reliability_pt = models.IntegerField()

@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block head%}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{%endblock%}
+
+{% block content %}
+    <div style="width: 600px; height: 600px;">
+        <canvas id="radarChart"></canvas>
+    </div>
+    <div>
+        <h2>Feedback Received:</h2>
+        <ul>
+            {% for fb in feedback %}
+                <h3>from post {{ fb.team.recruit_post.heading }}</h3>
+                <li>communication point: {{ fb.communication_pt }}</li>
+                <li>collaboration point: {{ fb.collaboration_pt }}</li>
+                <li>reliability point: {{ fb.reliability_pt }}</li>
+                <li>technical point: {{ fb.technical_pt }}</li>
+                <li>empathy point: {{ fb.empathy_pt }}</li>
+                <li>comment point: {{ fb.comment }}</li>
+            {% empty %}
+                <li>No feedback yet.</li>
+            {% endfor %}
+        </ul>
+    </div>  
+    <script>
+        const ctx = document.getElementById('radarChart').getContext('2d');
+        const radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: {{ labels|safe }},
+                datasets: [
+                    {
+                        label: 'Average feedback point',
+                        data: {{ dataset1|safe }},
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                    },
+                ],
+            },
+            options: {
+                scales: {
+                    r: {
+                        angleLines: { display: true },
+                        suggestedMin: 0,
+                        suggestedMax: 5,
+                    },
+                },
+            },
+        });
+    </script>
+{% endblock %}
