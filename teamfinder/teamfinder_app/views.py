@@ -60,8 +60,8 @@ def web_login(request):
                         user = User.objects.create_user(
                             username=username,  # Use 'username' as the unique identifier
                             password=password,
-                            email=data.get("email"),
-                            first_name=data.get("displayname_en"),
+                            email_address=data.get("email"),
+                            name=data.get("displayname_en"),
                             major=data.get("department"),
                             faculty=data.get("faculty"),
                             year=year,
