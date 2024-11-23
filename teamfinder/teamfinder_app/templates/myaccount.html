@@ -2,39 +2,22 @@
 {% block content %}
 
 <div class="profile">
-    <h2>{{userdata.first_name}}'s Profile</h2>
+    <h2>{{userdata.name}}'s Profile</h2>
     {% if user.profile.profile_image %}
         <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s Profile Picture" style="width: 150px; height: 150px;">
     {% else %}
         <img src="/media/images/fallback.png" alt="Default Profile Picture" style="width: 150px; height: 150px;">
     {% endif %}
+    <h2>{{userdata.faculty}}</h2>
+    <h2>{{userdata.major}}</h2>
 
-    <h2>Teams You've Joined:</h2>
-    <ul>
-        {% for team in current_joinedteams %}
-            <li>{{ team.name }}</li>
-        {% empty %}
-            <li>No teams joined yet.</li>
-        {% endfor %}
-    </ul>
-    <h2>Teams You're Leading:</h2>
-    <ul>
-    {% for team in current_leadteams %}
-        <li>{{ team.name }}</li>
-    {% empty %}
-        <li>You're not leading any teams currently.</li>
-    {% endfor %}
-    </ul>
-    <h2>Feedback Received:</h2>
-    <ul>
-        {% for fb in feedback %}
-            <li>{{ fb.comment }}</li>
-        {% empty %}
-            <li>No feedback yet.</li>
-        {% endfor %}
-    </ul>
 </div>
 
-
+<h2>Upload Profile Picture</h2>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Upload</button>
+</form>
 
 {% endblock %}

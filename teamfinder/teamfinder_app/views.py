@@ -107,6 +107,15 @@ def myaccount(request):
     current_leadteams = Team.objects.filter(team_leader=user)
     resultpost = ResultPost.objects.filter(post__user=user)
     feedback = Feedback.objects.filter(receiver=user)
+
+    if request.method == 'POST':
+        form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()  # Save the updated UserProfile with the new image
+            return redirect('/myaccount')  
+    else:
+        form = ProfileImageUploadForm(instance=request.user.profile)
+    
     context = {
         "username": user.username,
         "userdata": user,
@@ -115,12 +124,23 @@ def myaccount(request):
         "current_leadteams" : current_leadteams,
         "resultpost": resultpost,
         "feedback": feedback,
+        "form": form,
     }
-
     return render(request, 'myaccount.html', context)
 
+# def upload_profile_image(request):
+# if request.method == 'POST':
+#     form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
+#     if form.is_valid():
+#         form.save()  # Save the updated UserProfile with the new image
+#         return redirect('/myaccount')  
+# else:
+#         form = ProfileImageUploadForm(instance=request.user.profile)
+
+# return render(request, 'myaccount.html', {'form': form})
+
 #upload profile
-@login_required
+@login_required(login_url="/login")
 def upload_profile_image(request):
     if request.method == 'POST':
         form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
@@ -130,7 +150,7 @@ def upload_profile_image(request):
     else:
          form = ProfileImageUploadForm(instance=request.user.profile)
 
-    return render(request, 'upload_profile_image.html', {'form': form})
+    return render(request, 'myaccount.html', {'form': form})
 
 #Logout
 def web_logout(request):

@@ -24,5 +24,5 @@ urlpatterns = [
     path('result/search', views.search_result, name='search_result'),
     path('comment/<post_id>', views.web_comment, name='comment'),
     path('help', views.help, name='help'),
-    path('upload_profile_image', views.upload_profile_image, name='upload_profile_image'),
+    # path('upload_profile_image', views.upload_profile_image, name='upload_profile_image'),
 ]
