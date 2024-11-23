@@ -1,6 +1,22 @@
 from django import forms
-from .models import UserProfile
+from .models import UserProfile, User
 from teamfinder_app.models import Feedback
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+
+
+class CustomUserCreationForm(UserCreationForm):
+
+    class Meta:
+        model = User
+        fields = ("username", "email", "name", "major", "faculty", "year")
+
+
+class CustomUserChangeForm(UserChangeForm):
+
+    class Meta:
+        model = User
+        fields = ("username", "email", "name", "major", "faculty", "year")
+
 
 class RequestMessageForm(forms.Form):
     message = forms.CharField(max_length=200)

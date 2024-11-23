@@ -1,10 +1,53 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from .forms import CustomUserCreationForm, CustomUserChangeForm
+from .models import * 
 
-# Register your models here.
-from django.apps import apps
-from .models import *  # Import your models
+class CustomUserAdmin(UserAdmin):
+    add_form = CustomUserCreationForm
+    form = CustomUserChangeForm
+    model = User
+    list_display = ("username", "email", "name", "major", "faculty", "year", "is_staff", "is_active",)
+    list_filter = ("email", "is_staff", "is_active",)
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        ("Permissions", {"fields": ("is_staff", "is_active", "groups", "user_permissions")}),
+    )
+    add_fieldsets = (
+        (None, {
+            "classes": ("wide",),
+            "fields": (
+                "email", "password1", "password2", "is_staff",
+                "is_active", "groups", "user_permissions"
+            )}
+        ),
+    )
+    search_fields = ("username",)
+    ordering = ("username",)
 
-# Dynamically register all models from your app
-app = apps.get_app_config('teamfinder_app')  # Replace with your app's name
-for model in app.get_models():
+admin.site.register(User, CustomUserAdmin)
+
+model_list = [
+    UserProfile,
+    Faculty,
+    FacultyTag,
+    Major,
+    MajorTag,
+    Group,
+    GroupMember,
+    Message,
+    DirectMessage,
+    GroupMessage,
+    Post,
+    PostComment,
+    ResultPost,
+    RecruitPost,
+    Requirement,
+    Request,
+    Team,
+    TeamMember,
+    Feedback,
+]
+
+for model in model_list:
     admin.site.register(model)

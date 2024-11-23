@@ -1,19 +1,37 @@
 from django.db import models
-from django.contrib.auth.models import User
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, User
 from taggit.managers import TaggableManager
 from taggit.models import TagBase, GenericTaggedItemBase
+from django.contrib.auth.base_user import BaseUserManager
+
+class CustomUserManager(BaseUserManager):
+
+    def create_user(self, username, password, **extra_fields):
+        user = self.model(username=username, **extra_fields)
+        user.set_password(password)
+        user.save()
+
+        return user
+
+    def create_superuser(self, username, password, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
+
+        return self.create_user(username, password, **extra_fields)
 
 class User(AbstractUser):
-    user_id = models.CharField(primary_key=True, max_length=32)
-    password = models.CharField(max_length=128)
-    email_address = models.EmailField(unique=True)
+    username = models.CharField(unique=True, max_length=32)
+    email_address = models.EmailField(blank=True)
     name = models.CharField(max_length=255)
     major = models.CharField(max_length=255)
     faculty = models.CharField(max_length=255)
-    year = models.IntegerField()
+    year = models.IntegerField(blank=True, null=True)
 
-    REQUIRED_FIELDS = ['year']
+    USERNAME_FIELD = "username"
+    REQUIRED_FIELDS = []
+
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.username

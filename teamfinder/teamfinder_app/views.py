@@ -48,7 +48,7 @@ def web_login(request):
                 return redirect('/myaccount')
 
             # If User does not exist
-            if User.objects.filter(user_id=username).first() == None:
+            if User.objects.filter(username=username).first() == None:
                 # Try authenticating using the external API
                 try:
                     tu_response = tu.auth(user=username, password=password)
@@ -108,7 +108,7 @@ def myaccount(request):
     resultpost = ResultPost.objects.filter(post__user=user)
     feedback = Feedback.objects.filter(receiver=user)
     context = {
-        "user_id": user.user_id,
+        "username": user.username,
         "userdata": user,
         "created_post": created_post,
         "current_joinedteams": current_joinedteams,
@@ -537,7 +537,7 @@ def feedback(request, team_id):
 
     if request.method == 'POST':
         for member in members:
-            form = FeedbackForm(request.POST, prefix=f"feedback_{member.user_id}")
+            form = FeedbackForm(request.POST, prefix=f"feedback_{member.username}")
             if form.is_valid():
                 feedback = Feedback.objects.create(
                     reviewer=user,
@@ -554,8 +554,8 @@ def feedback(request, team_id):
         return redirect('/myaccount')
     
     for member in members:
-        feedback_form = FeedbackForm(prefix=f"feedback_{member.user_id}")
-        feedback_forms[member.user_id] = feedback_form
+        feedback_form = FeedbackForm(prefix=f"feedback_{member.username}")
+        feedback_forms[member.username] = feedback_form
 
     context = {
         "user": user,
