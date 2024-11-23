@@ -1,9 +1,32 @@
 {% extends 'base.html' %}
+{% load static %}
+{% block title %}Myaccount{% endblock %}
 {% block content %}
-<div class="col-md-4">
-    <br>
-    <img src="media/images/{{userdata.profile_image}}" alt="my profile picture"> 
+<link rel="stylesheet" href="{% static 'styles/myaccount.css' %}">
+<style>
+    #id_profile_image {
+    display: none;
+}
+</style>
+<div class="profile-container">
+    <div class="profile-box">
+        {% if user.profile.profile_image %}
+            <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s Profile Picture" class="profile-pic">
+        {% else %}
+            <img src="/media/images/fallback.png" alt="Default Profile Picture" class="profile-pic">
+        {% endif %}
+        <h2>{{userdata.name}}'s Profile</h2>
+        <h3>{{userdata.faculty}}</h3>
+        <h3>{{userdata.major}}</h3>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <label for="id_profile_image" class="btn btn-primary">Upload Image</label>
+            {{ form.profile_image }}
+            <button type="submit" class="btn btn-primary">Update Image</button>
+          </form>
+        <a href="#" class="btn btn-primary">Stats</a>
+    </div>
 </div>
-
 
 {% endblock %}

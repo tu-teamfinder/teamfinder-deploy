@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model, get_user
 from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team
 from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
-from teamfinder_app.forms import RequestMessageForm, ImageUploadForm, FeedbackForm
+from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
 from django.db.models import Q
@@ -107,6 +107,15 @@ def myaccount(request):
     current_leadteams = Team.objects.filter(team_leader=user)
     resultpost = ResultPost.objects.filter(post__user=user)
     feedback = Feedback.objects.filter(receiver=user)
+
+    if request.method == 'POST':
+        form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()  # Save the updated UserProfile with the new image
+            return redirect('/myaccount')  
+    else:
+        form = ProfileImageUploadForm(instance=request.user.profile)
+    
     context = {
         "username": user.username,
         "userdata": user,
@@ -115,23 +124,33 @@ def myaccount(request):
         "current_leadteams" : current_leadteams,
         "resultpost": resultpost,
         "feedback": feedback,
+        "form": form,
     }
-
     return render(request, 'myaccount.html', context)
 
-#upload profile
-def upload_image(request):
-    profile = request.userprofile  
+# def upload_profile_image(request):
+# if request.method == 'POST':
+#     form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
+#     if form.is_valid():
+#         form.save()  # Save the updated UserProfile with the new image
+#         return redirect('/myaccount')  
+# else:
+#         form = ProfileImageUploadForm(instance=request.user.profile)
 
+# return render(request, 'myaccount.html', {'form': form})
+
+#upload profile
+@login_required(login_url="/login")
+def upload_profile_image(request):
     if request.method == 'POST':
-        form = ImageUploadForm(request.POST, request.FILES, instance=profile)
+        form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()  # Save the updated UserProfile with the new image
-            return redirect('profile')  # Redirect to a success page or profile view
+            return redirect('/myaccount')  
     else:
-        form = ImageUploadForm(instance=profile)
+         form = ProfileImageUploadForm(instance=request.user.profile)
 
-    return render(request, 'upload_image.html', {'form': form})
+    return render(request, 'myaccount.html', {'form': form})
 
 #Logout
 def web_logout(request):
