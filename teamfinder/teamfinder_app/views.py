@@ -209,7 +209,7 @@ def result(request):
         posts.append(post.post)
 
     context = {
-        "post": post
+        "posts": posts
     }
 
     return render(request, 'result.html', context)
