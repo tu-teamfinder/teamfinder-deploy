@@ -7,6 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
     <link rel="stylesheet" href="{% static 'styles/create.css' %}">
 {%endblock%}
+
 {% block content %}
     <div class="form-container mt-4">
         <h2 style="color:white;">Create Recruitment Post</h2>
@@ -25,21 +26,26 @@
                 <input id="req_faculty" name="req_faculty" placeholder="e.g., Computer Science, Engineering">
             </div>
             <!-- Required Major -->
-            <div class="form-group">
+            <div class="form-group" >
                 <label for="req_major">Required Major</label>
                 <input type="text" id="req_major" name="req_major" placeholder="e.g., Software Engineering, Data Science">
             </div>
 
             <!-- Year Input -->
-            <div class="form-group">
-                <label for="year">Year</label>
-                <input type="number" id="min_year" name="min_year" placeholder="1, 2, 3" required>
-            </div>
-
-            <div class="form-group">
-                <label for="year">Year</label>
-                <input type="number" id="max_year" name="max_year" placeholder="1, 2, 3" required>
-            </div>
+            <label for="year">Year</label>
+            <div class="input-group" style="width:500px;"> 
+                <!-- declaration for first field -->
+                <input type="number" class="form-control id="min_year" name="min_year" min="1" max="10"
+                        input-sm" required placeholder="Min Year"/> 
+          
+                <!-- reducong the gap between them to zero -->
+                <span class="input-group-btn" 
+                    style="width:0px;"></span> 
+          
+                <!-- declaration for second field -->
+                <input type="number" class="form-control id="max_year" name="max_year" min="1" max="10"
+                        input-sm" required placeholder="Max Year"/> 
+            </div> 
 
             <!-- Description -->
             <div class="form-group">

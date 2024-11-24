@@ -6,33 +6,23 @@
 <div class="teams-container">
     <h1>Active</h1>
     <div class="team-box-container">
+        {%for team in active%}
         <div class="team-box">
-            <a href="#"> Work abc </a>
+            <a href="{% url 'team' team.team_id%}"> {{team.recruit_post.heading}} </a>
         </div>
-        <div class="team-box">
-            <a href="#"> Work abc </a>
-        </div>
-        <div class="team-box">
-            <a href="#"> Work abc </a>
-        </div>
-        <div class="team-box">
-            <a href="#"> Work abc </a>
-        </div>
+        {%endfor%}
+
     </div>
 </div>
 
 <div class="teams-container">
     <h1>Finished</h1>
+    {%for team in finished%}
     <div class="team-box-container">
         <div class="team-box">
-            <a href="#"> Work xyz </a>
-        </div>
-        <div class="team-box">
-            <a href="#"> Work xyz </a>
-        </div>
-        <div class="team-box">
-            <a href="#"> Work xyz </a>
+            <a href="{% url 'team' team.team_id%}"> {{team.recruit_post.heading}} </a>
         </div>
     </div>
+    {%endfor%}
 </div>
 {% endblock %}
