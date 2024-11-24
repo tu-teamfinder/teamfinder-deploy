@@ -409,7 +409,7 @@ def web_requirement(request):
         requirement.req_major.set(req_major)
         requirement.save()
 
-        team = Team.objects.create(team_leader=user)        
+        team = Team.objects.create(team_leader=user, recruit_post=post)        
         TeamMember.objects.create(team=team, member=user)
 
         request.session['visited_create'] = False
