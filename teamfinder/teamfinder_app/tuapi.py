@@ -59,3 +59,14 @@ def get_faculty_all() -> dict:
     return {"status": status, "data": data}
 
 
+def get_department_all() -> dict:
+    """
+    Get all department name
+    """
+
+    url = v2 + "/std/dep/all"
+    response = requests.get(url, headers=headers)
+    status = response.status_code
+    data = response.json()
+    
+    return {"status": status, "data": data}
