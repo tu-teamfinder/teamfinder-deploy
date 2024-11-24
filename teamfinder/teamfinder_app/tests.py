@@ -194,7 +194,7 @@ class TestViews(TestCase):
       self.assertEqual(response.status_code, 200)
       self.assertEqual(len(response.context["posts"]), 7)
    
-   # def test_result(self):
+   # def test_result(self): #Need result.html
    #    """test result send all result post"""
 
    #    c = Client()
@@ -318,13 +318,13 @@ class TestViews(TestCase):
       c = Client()
       c.login(username="6510615888", password="password123")
       data = {
-         "heading": "LOL 5 v 5",
-         "content": "Pentakill",
+         "heading": "",
+         "content": "",
          "amount": -1,
-         "tags": "T1, T20"
+         "tags": "T1, T20, T4, T5"
       }
       response = c.post("/create", data=data, follow=True)
-      message = str(list(get_messages(response.wsgi_request))[0])
+      message = list(get_messages(response.wsgi_request))
       self.assertEqual(response.request["PATH_INFO"], "/create")
       self.assertEqual(response.status_code, 200)
       self.assertFalse(c.session['visited_create'])
@@ -332,7 +332,7 @@ class TestViews(TestCase):
       self.assertEqual(response.context["content"], data["content"])
       self.assertEqual(response.context["amount"], data["amount"])
       self.assertEqual(response.context["tags"], data["tags"])
-      self.assertEqual(message, 'Can recruit 1 to 50')
+      self.assertEqual(len(message), 4)
 
    def test_web_requirement_case1(self):
       """test web requirement : GET"""
@@ -398,17 +398,17 @@ class TestViews(TestCase):
       session["tags"] = "T1, T20"
       session.save()
       data = {
-         "req_faculty": "ENGR",
-         "req_major": "CS",
+         "req_faculty": "",
+         "req_major": "",
          "min_year": "5",
          "max_year": "4",
-         "description": "1 v 1 Me"
+         "description": ""
       }
       response = c.post("/create/requirement", data=data, follow=True)
-      message = str(list(get_messages(response.wsgi_request))[0])
+      message = list(get_messages(response.wsgi_request))
       self.assertEqual(response.request["PATH_INFO"], "/create/requirement")
       self.assertEqual(response.status_code, 200)
-      self.assertEqual(message, "min <= max")
+      self.assertEqual(len(message), 4)
       self.assertEqual(Post.objects.all().count(), 20)
       self.assertEqual(Team.objects.all().count(), 20)
       self.assertEqual(TeamMember.objects.all().count(), 20)
