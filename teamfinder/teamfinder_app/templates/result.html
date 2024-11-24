@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Recruitment{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'styles/recruit.css' %}">
+    <section id = "blog">
+        <!--container-->
+        <div class="blog-box-container">
+            {% for post in posts %}
+            <!--box1-->     
+            <div class="blog-box">
+                <!--text-->
+                <div class="blog-box-text">
+                    <!--author-->
+                    <div class="blog-author" >
+                        <div class="blog-author-text">
+                            <strong>{{post.user.name}}</strong>
+                            <span> {{post.timestamp}}</span>
+                        </div>
+                    </div>
+                    <!--heading-->
+                    <a href="{% url 'post' post.post_id%}"> {{post.heading}} </a>
+                    <p> {{post.content}} <br></p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
+
+

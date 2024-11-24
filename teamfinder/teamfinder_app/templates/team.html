@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="modal" id="Modal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Do you want to Post Result?</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <a href="{% url 'finish' team_id "yes"%}"><button type="button" class="btn btn-primary">Yes</button></a>
+            <a href="{% url 'finish' team_id "no"%}"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button></a>
+        </div>
+        </form>
+      </div>
+    </div>
+</div>
+
+    <div class="team-details-container">
+        <h2>Team Details</h2>
+
+        <!-- Team Information -->
+        <div class="team-info">
+            <h3>Team Leader: {{ team.team_leader.username }}</h3>
+            <p><strong>Recruitment Post Status:</strong> {% if is_finish %}Finished{% else %}Active{% endif %}</p>
+        </div>
+
+        <!-- Team Members List -->
+        <div class="team-members">
+            <h3>Team Members</h3>
+            <ul>
+                {% for member in members %}
+                    <li>{{ member.username }}</li>
+                {% empty %}
+                    <p>No members found.</p>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Owner Specific Section -->
+        {% if is_owner %}
+            <div class="owner-section">
+                <h3>As the Team Leader:</h3>
+                <p>You have full control over the team and its recruitment process.</p>
+                <!-- Optionally add actions for the owner (like edit or delete the team) -->
+            </div>
+        {% endif %}
+        
+        <!-- Finished Team Section -->
+        {% if is_finish %}
+            <div class="finished-team">
+                <h3>This Team's Recruitment Post is Finished</h3>
+                <p>No further actions can be taken on this team.</p>
+            </div>
+        {%else%}
+            {%if is_owner%}
+            <div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
+                Finish
+              </button></div>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

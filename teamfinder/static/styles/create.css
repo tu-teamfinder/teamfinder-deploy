@@ -90,3 +90,8 @@ color: black;
 background: lightyellow;
 border-color: gold;
 }
+
+
+.form-group-year {
+    display: inline;
+}
