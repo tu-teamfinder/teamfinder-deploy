@@ -408,7 +408,7 @@ class TestViews(TestCase):
       message = list(get_messages(response.wsgi_request))
       self.assertEqual(response.request["PATH_INFO"], "/create/requirement")
       self.assertEqual(response.status_code, 200)
-      self.assertEqual(len(message), 4)
+      self.assertEqual(len(message), 2)
       self.assertEqual(Post.objects.all().count(), 20)
       self.assertEqual(Team.objects.all().count(), 20)
       self.assertEqual(TeamMember.objects.all().count(), 20)

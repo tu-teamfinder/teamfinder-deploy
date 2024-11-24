@@ -21,8 +21,10 @@ def is_requestable(user, post_id):
         return False
     
     requirement = Requirement.objects.get(post=recruit)
-    faculty_check = user.faculty in [faculty.name for faculty in requirement.req_faculty.all()]
-    major_check = user.major in [major.name for major in requirement.req_major.all()]
+    faculty_list = [faculty.name for faculty in requirement.req_faculty.all()]
+    major_list = [major.name for major in requirement.req_major.all()]
+    faculty_check = user.faculty in faculty_list or "Any" in faculty_list
+    major_check = user.major in major_list or "Any" in major_list
     year_check = user.year in list(range(requirement.year_min, requirement.year_max+1))
     requestable = faculty_check | major_check & year_check
 
@@ -358,12 +360,10 @@ def web_requirement(request):
         invalid = False
 
         if len(req_faculty) == 0:
-            invalid = True
-            messages.error(request, 'At least 1 faculty')
+            req_faculty = ["Any"]
 
         if len(req_major) == 0:
-            invalid = True
-            messages.error(request, 'At least 1 major')
+            req_major = ["Any"]
 
         if min_year > max_year:
             invalid = True

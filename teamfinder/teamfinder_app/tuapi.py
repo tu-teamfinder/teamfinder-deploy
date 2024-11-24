@@ -40,7 +40,20 @@ def get_user_info(user: str) -> dict:
         
     url = v2 + f"/profile/std/info/?id={user}"
     response = requests.get(url, headers=headers)
-    status = response.status_code()
+    status = response.status_code
+    data = response.json()
+    
+    return {"status": status, "data": data}
+
+
+def get_faculty_all() -> dict:
+    """
+    Get all faculty name
+    """
+
+    url = v2 + "/std/fac/all"
+    response = requests.get(url, headers=headers)
+    status = response.status_code
     data = response.json()
     
     return {"status": status, "data": data}
