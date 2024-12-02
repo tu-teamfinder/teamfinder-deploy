@@ -24,5 +24,7 @@ urlpatterns = [
     path('result/search', views.search_result, name='search_result'),
     path('comment/<post_id>', views.web_comment, name='comment'),
     path('help', views.help, name='help'),
-    path('mystats', views.my_stats, name='mystats')
+    path('mystats', views.my_stats, name='mystats'),
+    path('status/<post_id>', views.toggle_status, name='toggle-status'),
+    path('accept/<team_id>/<request_id>', views.accept, name='accept'),
 ]

@@ -283,6 +283,22 @@ def web_comment(request, post_id):
     return redirect(f'/post/{post_id}')
 
 
+#Toggle-Status
+@login_required(login_url="/login")
+def toggle_status(request, post_id):
+    user = request.user
+    post = Post.objects.filter(post_id=post_id, user=user).first()
+
+    if not post:
+        return render(request, 'pagenotfound.html', status=404)
+
+    recruit = RecruitPost.objects.get(post=post)
+    recruit.status = not recruit.status
+    recruit.save()
+    
+    return redirect(f'/post/{post_id}')
+
+
 #Create Post
 @login_required(login_url="/login")
 def create_post(request):
@@ -485,14 +501,40 @@ def team(request, team_id):
     is_owner = team.team_leader == user
     is_finish = team.recruit_post.finish
 
+    request_list = list(Request.objects.filter(post=team.recruit_post)) if is_owner else []
+    
     context = {
         "team_id": team_id,
         "members": members,
         "is_owner": is_owner,
-        "is_finish": is_finish
+        "is_finish": is_finish,
+        "request_list": request_list
     }
 
     return render(request, 'team.html', context)
+
+
+#Accept
+@login_required(login_url="/login")
+def accept(request, request_id):
+    user = request.user
+    req = Request.objects.filter(request_id=request_id).first()
+
+    if (not req):
+        return render(request, 'pagenotfound.html', status=404)
+
+    post = req.post
+
+    if user != post.user:
+        return render(request, 'pagenotfound.html', status=404)
+    
+    team = Team.objects.get(recruit_post=post)
+    TeamMember.objects.create(
+        team=team,
+        member=req.user
+    )
+
+    return redirect(f'/team/{team.team_id}')
 
 
 #Finish
