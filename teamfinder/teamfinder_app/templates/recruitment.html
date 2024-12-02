@@ -1,8 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Recruitment{% endblock %}
+{% block head%}
+<link rel="stylesheet" href="{% static "styles/recruit.css" %}">
+{%endblock%}
 {% block content %}
-<link rel="stylesheet" href="{% static 'styles/recruit.css' %}">
     <section id = "blog">
         <!--container-->
         <div class="blog-box-container">
@@ -20,7 +22,7 @@
                     </div>
                     <!--heading-->
                     <a href="{% url 'post' post.post_id%}"> {{post.heading}} </a>
-                    <p> {{post.content}} <br></p>
+                    <p>{{post.content}}</p>
                 </div>
             </div>
             {% endfor %}
