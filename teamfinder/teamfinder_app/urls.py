@@ -26,5 +26,5 @@ urlpatterns = [
     path('help', views.help, name='help'),
     path('mystats', views.my_stats, name='mystats'),
     path('status/<post_id>', views.toggle_status, name='toggle-status'),
-    path('accept/<team_id>/<request_id>', views.accept, name='accept'),
+    path('accept/<request_id>', views.accept, name='accept'),
 ]
