@@ -1,6 +1,7 @@
 body, html{
     height: 100%;
     margin: 0;
+    font-family: 'Open Sans', sans-serif;
 }
 .background {
     position: absolute;
@@ -9,59 +10,42 @@ body, html{
     background-image: url("https://storage-wp.thaipost.net/2023/11/IMG_5749_0_0_0-1.jpg");
     background-size: cover;
     background-position: center;
-    filter: blur(5px);
+    filter: brightness(0.7);
     z-index: -1;
-  }
-
+}
 .container{
     display: inline-flex;
     justify-content: space-between;
     align-items: center;
-    padding: 50px;  
-}
-.user-container{
-    width: 350px;
-    display: inline-flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px 20px;
-    background-color: transparent;
-    border-radius: 15px;
-    border: solid 2px white;
+    padding: 50px;
+    margin: 3%;
 }
 .text-section {
-    max-width: 600px;
+    max-width: 50%;
 }
 .text-section h1 {
-    font-size: 48px;
+    font-size: 53px;
     margin: 0;
     color: #ffd13f;
 }
 .text-section h2 {
     font-size: 32px;
     color: #c3002f;
-    
-}
-.text-section h3 {
-    font-size: 24px;
-    margin: 0;
-    color: white;
 }
 .text-section p {
     font-size: 20px;
     margin: 20px 0;
     color:white;
 }
-.button{
+.button {
     display: inline-block;
     padding: 15px 25px;
-    background-color: #ffd13f;
-    color:black;
-    border-radius: 5px;
-}
-.button:hover{
     background-color: #d8b235;
+    color:white;
+    border-radius: 12px;
+    text-decoration:none; 
+    font-size: 16px; 
 }
-.image-section img {
-    border-radius: 10px;
+.button:hover {
+    background-color: #be4d00;
 }
