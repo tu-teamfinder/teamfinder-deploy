@@ -6,11 +6,10 @@
     <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>   
     <link rel="stylesheet" href="{% static 'styles/create.css' %}">
 {%endblock%}
-
 {% block content %}
-
-    <div class="form-container mt-4">
-        <h1 style="color: white; font-weight:0;">Create a Post</h1>
+<div class="container">
+    <div class="form-container mt-5">
+        <h1>Create a Post</h1>
 
         <!-- Display a warning if there are too many tags -->
         {% if messages %}
@@ -20,21 +19,30 @@
             {% endfor %}
         </div>
         {% endif %}
+
         <form method="POST" action="">
             {% csrf_token %}
             <div class="form-group">
-                <label for="heading" style="font-weight:0;">Title</label>
-                <input type="text" id="heading" name="heading" value="{{ heading|default:'' }}">
+                <label for="heading" class="col-form-label" >Title</label> 
+                <input type="text" class="form-control" id="heading" name="heading" value="{{ heading|default:'' }}">
             </div>
 
             <div class="form-group">
-                <label for="content">Description</label>
-                <textarea id="content" name="content" rows="5" >{{ content|default:'' }}</textarea>
+                <label for="content" class="col-form-label" >Description</label>
+                <textarea class="form-control" id="content" name="content" rows="5" >{{ content|default:'' }}</textarea>
             </div>
 
             <div class="form-group">
                 <label for="amount">Team Size</label>
-                <input type="number" id="amount" name="amount" required value="{{ amount|default:'1' }}" >
+                <input class="form-control" type="number" id="amount" name="amount" required value="{{ amount|default:'1' }}" min="1" max="50" list="team-size-options">
+                <datalist id="team-size-options">
+                    <option value="1">
+                    <option value="5">
+                    <option value="10">
+                    <option value="20">
+                    <option value="50">
+                </datalist>
+                <small>Enter a value between 1 and 50. Examples: 1, 5, 10, 20, 50</small>
             </div>
             <div class="form-group">
                 <label for="tag">Tags</label>
@@ -56,8 +64,9 @@
                     })
                 </script>
             </div>
-            <button href="/recruitment " class="button" style="margin-right:10px; background-color:#ff7851;">Cancel</a>
-            <button type="submit" class="button">Next</button>
+            <a class="btn btn-warning" type="button" href="{% url 'recruitment'%}" style="margin-right:10px;">Cancel</a>
+            <button type="submit" class="btn btn-primary">Next</button>
         </form>
     </div>
+</div>
 {% endblock %}

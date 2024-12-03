@@ -1,0 +1,28 @@
+.teams-container {
+    margin: 20px 20px 20px 20px;
+    border: solid 2px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+h1 {
+    padding: 10px 10px 0px 10px;
+}
+
+.team-box-container {
+    padding: 10px 10px 10px 10px;
+    margin: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-gap: 2rem;
+}
+.team-box {
+    margin-bottom: 1rem;
+    color: white;
+    border: solid 2px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+}
+
+.team-box:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    box-shadow: 16px 20px 50px rgba(0, 0, 0, 0.12);
+}
