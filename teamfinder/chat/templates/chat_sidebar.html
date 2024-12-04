@@ -1,7 +1,7 @@
 <div class="tw-col-3 tw-bg-white tw-flex-shrink-0">
     <div class="tw-contacts">
         {% for chat in chat_list %}
-        <a href="/chat/{{ chat.group_id }}" class="tw-text-black tw-block tw-py-4 tw-px-8 hover:tw-bg-gray-200">Chat {{ chat.name }}</a>
+        <a href="/chat/{{ chat.group_id }}" class="tw-text-black tw-block tw-py-4 tw-px-8 hover:tw-bg-gray-200">{{ chat.team.recruit_post.heading }}</a>
         {% endfor %}
     </div>
 </div>

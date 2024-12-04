@@ -5,7 +5,6 @@ class ChatGroup(models.Model):
     group_id = models.AutoField(primary_key=True)
     team = models.ForeignKey(Team, related_name='teamchats', null=True, on_delete=models.CASCADE)
     admin = models.ForeignKey(User, related_name='groupchats', blank=True, null=True, on_delete=models.SET_NULL)
-    users_online = models.ManyToManyField(User, related_name='online_in_groups', blank=True)
     members = models.ManyToManyField(User, related_name='chat_groups', blank=True)
     is_private = models.BooleanField(default=False)
     
