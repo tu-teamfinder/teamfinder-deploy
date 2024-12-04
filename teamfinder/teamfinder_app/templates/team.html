@@ -1,4 +1,8 @@
 {% extends 'base.html' %}
+{%load static%}
+{% block head%} 
+<link rel="stylesheet" href="{% static 'styles/team.css' %}">
+{%endblock%}
 {% block content %}
 <div class="modal" id="Modal">
     <div class="modal-dialog" role="document">
@@ -18,35 +22,41 @@
     </div>
 </div>
 
-    <div class="team-details-container">
+<div class="card-wrapper">
+    <div class="text">
+        <div class="name">Test</div>
+        <div class="message">Sawaddee Krub</div>
+    </div>
+    <div class="btn-wrapper">
+        <button class="btn btn-light">Later</button>
+        <button class="btn btn-secondary">Accept</button>
+    </div>
+</div>
+
+
+
+<div class="number"><p>1</p></div>
+<div class=container>
+    <div class="card bg-light mb-3" style="margin:200px; padding:1rem;">
         <h2>Team Details</h2>
+        <div class="card-body">
+            <!-- Team Information -->
+                <div class="team-info">
+                    <p style="display: inline-block;;"><strong>Post Status:</strong> {% if is_finish %}Finished{% else %}Active{% endif %}</p>
+                    <span><a href="{% url 'post' team.recruit_post.post_id%}">Go to Post</a></span>
+                </div>
 
-        <!-- Team Information -->
-        <div class="team-info">
-            <h3>Team Leader: {{ team.team_leader.username }}</h3>
-            <p><strong>Recruitment Post Status:</strong> {% if is_finish %}Finished{% else %}Active{% endif %}</p>
-        </div>
-
-        <!-- Team Members List -->
-        <div class="team-members">
-            <h3>Team Members</h3>
-            <ul>
-                {% for member in members %}
-                    <li>{{ member.username }}</li>
-                {% empty %}
-                    <p>No members found.</p>
-                {% endfor %}
-            </ul>
-        </div>
-
-        <!-- Owner Specific Section -->
-        {% if is_owner %}
-            <div class="owner-section">
-                <h3>As the Team Leader:</h3>
-                <p>You have full control over the team and its recruitment process.</p>
-                <!-- Optionally add actions for the owner (like edit or delete the team) -->
+            <!-- Team Members List -->
+            <div class="team-members">
+                <h3>Team Members</h3>
+                <ul>
+                    {% for member in members %}
+                        <li>{{ member.username }}</li>
+                    {% empty %}
+                        <p>No members found.</p>
+                    {% endfor %}
+                </ul>
             </div>
-        {% endif %}
         
         <!-- Finished Team Section -->
         {% if is_finish %}
@@ -54,12 +64,16 @@
                 <h3>This Team's Recruitment Post is Finished</h3>
                 <p>No further actions can be taken on this team.</p>
             </div>
+
         {%else%}
             {%if is_owner%}
             <div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
                 Finish
-              </button></div>
+            </button></div>
             {% endif %}
         {% endif %}
     </div>
+</div>
+{%block javascript%}
+{%endblock%}
 {% endblock %}

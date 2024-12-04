@@ -512,6 +512,7 @@ def team(request, team_id):
     request_list = list(Request.objects.filter(post=team.recruit_post)) if is_owner else []
     
     context = {
+        "team": team,
         "team_id": team_id,
         "members": members,
         "is_owner": is_owner,

@@ -3,26 +3,26 @@
 {% block title %}Team{% endblock %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'styles/team.css' %}">
-<div class="teams-container">
-    <h1>Active</h1>
-    <div class="team-box-container">
-        {%for team in active%}
-        <div class="team-box">
-            <a href="{% url 'team' team.team_id%}"> {{team.recruit_post.heading}} </a>
+<div class="responsive-two-column-grid">
+    <div class="teams-container">
+        <h1>Active</h1>
+        <div class="team-box-container">
+            {%for team in active%}
+                <a class ="btn btn-outline-primary" href="{% url 'team' team.team_id%}"> {{team.recruit_post.heading}} </a>
+
+            {%endfor%}
+
+        </div>
+    </div>
+
+    <div class="teams-container">
+        <h1>Finished</h1>
+        {%for team in finished%}
+        <div class="team-box-container">
+            <a class="btn btn-outline-success" href="{% url 'team' team.team_id%}"> {{team.recruit_post.heading}} </a>
         </div>
         {%endfor%}
-
     </div>
-</div>
+    
 
-<div class="teams-container">
-    <h1>Finished</h1>
-    {%for team in finished%}
-    <div class="team-box-container">
-        <div class="team-box">
-            <a href="{% url 'team' team.team_id%}"> {{team.recruit_post.heading}} </a>
-        </div>
-    </div>
-    {%endfor%}
-</div>
 {% endblock %}

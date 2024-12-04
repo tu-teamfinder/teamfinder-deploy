@@ -52,6 +52,8 @@
         </div>
     </div>
 </section>
+
+
 <div class="modal" id="Modal">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -81,10 +83,25 @@
     Request
   </button></div>
 {%endif%}
+
 {%if is_owner%}
     <div style="bottom: 10%; right: 10%; position:fixed;">
-        <input type="checkbox" class="btn-check" id="btn-check-outlined" autocomplete="off">
-        <label class="btn btn-outline-primary" for="btn-check-outlined">Activate</label><br>
+    <!-- Form to toggle the post status -->
+        <form action="{% url 'toggle-status' post_id %}" method="post" style="display: inline;">
+            {% csrf_token %}
+            <input 
+            type="checkbox" 
+            class="btn-check" 
+            id="btn-check-outlined" 
+            name="status" 
+            autocomplete="off" 
+            onchange="this.form.submit();" 
+            {% if status %}checked{% endif %}>
+            <label class="btn btn-outline-primary" for="btn-check-outlined">
+            Activate
+            </label>
+        </form>
     </div>
 {%endif%}
+
 {%endblock%}
