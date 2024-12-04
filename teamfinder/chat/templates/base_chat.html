@@ -1,0 +1,55 @@
+{% load static %}
+{% load django_htmx %} <!-- ไม่มี chat ไม่ได้ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Django Template">
+    <title>Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org@2.0.2"></script> <!-- ไม่มี chat ไม่ได้ -->
+    {% django_htmx_script %} <!-- ไม่มี chat ไม่ได้ -->
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script> <!-- ไม่มี chat ไม่ได้ -->
+    <script src="https://unpkg.com/hyperscript.org@0.9.12"></script> <!-- ไม่มี chat ไม่ได้ -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    />
+    <style type="text/tailwindcss">
+        h1 {
+            @apply text-4xl font-bold mb-4
+        }
+        h2 {
+            @apply text-xl font-bold mb-2
+        }
+        p {
+            @apply mb-4
+        }
+        .textarea, textarea, input {
+            @apply w-full rounded-lg py-4 px-5 bg-gray-100
+        }
+    </style>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' class="{% block class %}{% endblock %}">
+	
+
+    {% comment %} It was alert messages here {% endcomment %}
+    {% comment %} It was header here {% endcomment %}
+
+    <content class="block w-full">
+
+        {% block content %} 
+        {% endblock %}
+    
+    </content>
+
+    {% block javascript %}{% endblock %}
+
+</body>
+</html>

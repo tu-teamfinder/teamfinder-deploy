@@ -1,0 +1,57 @@
+{% extends 'base_chat.html' %}
+
+{% block content %}
+<div class="flex h-screen">
+    <!-- Sidebar -->
+    <div class="bg-gray-800 p-3 w-64 flex-shrink-0">
+        {% include 'chat_sidebar.html' %}
+    </div>
+
+    <!-- Main Chat Area -->
+    <div class="flex flex-col flex-grow h-full">
+        
+        <!-- Online Count -->
+        <div class="text-emerald-400 bg-gray-800 p-2">
+            <div id="online-icon" class="mr-2"></div>
+            <span id="online-count" class="pr-1"></span>online
+        </div>
+
+        <!-- Chat Container -->
+        <div id="chat_container" class="flex-grow overflow-y-auto bg-gray-900">
+            <ul id="chat_messages" class="flex flex-col justify-end gap-2 p-4">
+                {% for message in chat_messages reversed %}
+                {% include 'chat_message.html' %}
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Chat Input -->
+        <div id="chat_input_box" class="p-4 bg-gray-800">
+            <form id="chat_message_form" class="w-full"
+                hx-ext="ws"
+                ws-connect="/ws/chatroom/{{ group_id }}"
+                ws-send
+                _="on htmx:wsAfterSend reset() me">
+                {% csrf_token %}
+                {{ form }}
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block javascript %}
+<script>
+
+    function scrollToBottom(time=0) {
+        setTimeout(function() {
+            const container = document.getElementById('chat_container');
+            container.scrollTop = container.scrollHeight;
+        }, time);
+    }
+    scrollToBottom()
+
+</script>
+{% endblock %}

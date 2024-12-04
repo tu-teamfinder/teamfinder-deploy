@@ -1,0 +1,8 @@
+<div class="col-3 bg-gray-800 p-3 flex-shrink-0">
+    <h5 class="mb-3 text-white">Chats</h5>
+    <div class="contacts">
+        {% for chat in chat_list %}
+        <a href="/chat/{{ chat.group_id }}" class="text-white block py-2 px-4 hover:bg-gray-700">Chat {{ chat.name }}</a>
+        {% endfor %}
+    </div>
+</div>
