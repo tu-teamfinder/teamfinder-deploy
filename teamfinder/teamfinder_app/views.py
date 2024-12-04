@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model, get_user
 from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team
 from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
+from chat.models import ChatGroup
 from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm
 from django.core.exceptions import ObjectDoesNotExist
 from taggit.models import Tag
@@ -428,6 +429,13 @@ def web_requirement(request):
         team = Team.objects.create(team_leader=user, recruit_post=post)        
         TeamMember.objects.create(team=team, member=user)
 
+        chat_group = ChatGroup.objects.create(
+            team=team,
+            admin=user,
+        )
+        chat_group.members.add(user)
+        chat_group.save()
+
         request.session['visited_create'] = False
 
         return redirect('/recruitment')
@@ -533,6 +541,9 @@ def accept(request, request_id):
         team=team,
         member=req.user
     )
+
+    chat_group = ChatGroup.objects.filter(team=team).first()
+    chat_group.members.add(req.user)
 
     return redirect(f'/team/{team.team_id}')
 
