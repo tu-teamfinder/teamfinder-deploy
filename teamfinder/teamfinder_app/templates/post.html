@@ -28,7 +28,7 @@
                 {% for comment in comments%}
                 <div class="card border-dark mt-4 text-justify float-left">
                     <div class="card-body">
-                    <h4 style="display: inline;">{{comment.user.name}}</h4>
+                    <h4 style="display: inline; text-transform: capitalize;">{{comment.user.name}}</h4>
                     <span>{{comment.timestamp}}</span>
                     <br>
                     <p class="mt-2">{{comment.comment}}</p>
@@ -82,6 +82,9 @@
   </button></div>
 {%endif%}
 {%if is_owner%}
-<div style="bottom: 10%; right: 10%; position:fixed;"><a href='#' class="btn btn-primary">Status</a></div>
+    <div style="bottom: 10%; right: 10%; position:fixed;">
+        <input type="checkbox" class="btn-check" id="btn-check-outlined" autocomplete="off">
+        <label class="btn btn-outline-primary" for="btn-check-outlined">Activate</label><br>
+    </div>
 {%endif%}
 {%endblock%}
