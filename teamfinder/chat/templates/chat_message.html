@@ -1,16 +1,16 @@
 {% if message.author == user %}
-<li class="flex justify-end mb-4">
-    <div class="bg-green-200 rounded-lg p-4 max-w-[75%]">
+<li class="tw-flex tw-justify-end tw-mb-4">
+    <div class="tw-bg-red-200 tw-rounded-full tw-px-4 tw-py-2 tw-max-w-[75%]">
         <span>{{ message.body }}</span>
     </div>
 </li>
 {% else %}
 <li>
-    <div class="flex justify-start">
-        <span class="text-gray-400">{{ message.author.username }}</span>
+    <div class="tw-flex tw-justify-start">
+        <span class="tw-text-gray-500">{{ message.author.username }}</span>
     </div>
-    <div class="flex justify-start">
-        <div class="bg-white p-4 max-w-[75%] rounded-lg">
+    <div class="tw-flex tw-justify-start">
+        <div class="tw-bg-gray-200 tw-px-4 tw-py-2 tw-max-w-[75%] tw-rounded-full">
             <span>{{ message.body }}</span>
         </div>  
     </div>

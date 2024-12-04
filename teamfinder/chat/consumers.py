@@ -59,28 +59,3 @@ class ChatroomConsumer(WebsocketConsumer):
         }
         html = render_to_string("chat_message_p.html", context=context)
         self.send(text_data=html)
-        
-        
-    def update_online_count(self):
-        online_count = self.chatroom.users_online.count() -1
-        
-        event = {
-            'type': 'online_count_handler',
-            'online_count': online_count
-        }
-        async_to_sync(self.channel_layer.group_send)(self.group_id, event)
-        
-    def online_count_handler(self, event):
-        online_count = event['online_count']
-        
-        chat_messages = ChatGroup.objects.get(group_id=self.group_id).chat_messages.all()[:30]
-        author_ids = set([message.author.id for message in chat_messages])
-        users = User.objects.filter(id__in=author_ids)
-        
-        context = {
-            'online_count' : online_count,
-            'chat_group' : self.chatroom,
-            'users': users
-        }
-        html = render_to_string("online_count.html", context)
-        self.send(text_data=html) 

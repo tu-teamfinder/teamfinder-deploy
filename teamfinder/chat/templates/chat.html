@@ -1,24 +1,49 @@
-{% extends 'base_chat.html' %}
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Chat{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"/>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+<script src="https://unpkg.com/htmx.org@2.0.2"></script>
+<script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/ws.js"></script>
+<script src="https://unpkg.com/hyperscript.org@0.9.12"></script> 
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+    tailwind.config = {
+      prefix: 'tw-',
+    }
+</script>
+<style type="text/tailwindcss">
+    h1 {
+        @apply tw-text-4xl tw-font-bold tw-mb-4
+    }
+    h2 {
+        @apply tw-text-xl tw-font-bold tw-mb-2
+    }
+    p {
+        @apply tw-mb-4
+    }
+    input {
+        @apply tw-w-full tw-py-4 tw-px-5 tw-bg-white focus:tw-outline-none
+    }
+</style>
+<link rel="stylesheet" href="{% static "styles/chat.css" %}">
+{% endblock %}
 
 {% block content %}
-<div class="flex h-screen">
+<div id="main_content" class="tw-flex">
     <!-- Sidebar -->
-    <div class="bg-gray-800 p-3 w-64 flex-shrink-0">
+    <div class="tw-bg-white tw-w-64 tw-flex-shrink-0 tw-border-r tw-border-gray-400">
         {% include 'chat_sidebar.html' %}
     </div>
 
     <!-- Main Chat Area -->
-    <div class="flex flex-col flex-grow h-full">
-        
-        <!-- Online Count -->
-        <div class="text-emerald-400 bg-gray-800 p-2">
-            <div id="online-icon" class="mr-2"></div>
-            <span id="online-count" class="pr-1"></span>online
-        </div>
+    <div class="tw-flex tw-flex-col tw-flex-grow">
 
         <!-- Chat Container -->
-        <div id="chat_container" class="flex-grow overflow-y-auto bg-gray-900">
-            <ul id="chat_messages" class="flex flex-col justify-end gap-2 p-4">
+        <div id="chat_container" class="tw-flex-grow tw-overflow-y-auto tw-bg-white">
+            <ul id="chat_messages" class="tw-flex tw-flex-col tw-justify-end tw-gap-2 tw-p-4">
                 {% for message in chat_messages reversed %}
                 {% include 'chat_message.html' %}
                 {% endfor %}
@@ -26,14 +51,14 @@
         </div>
 
         <!-- Chat Input -->
-        <div id="chat_input_box" class="p-4 bg-gray-800">
-            <form id="chat_message_form" class="w-full"
+        <div id="chat_input_box" class="tw-bg-white tw-border-t tw-border-gray-400">
+            <form id="chat_message_form" class="tw-w-full"
                 hx-ext="ws"
                 ws-connect="/ws/chatroom/{{ group_id }}"
                 ws-send
                 _="on htmx:wsAfterSend reset() me">
                 {% csrf_token %}
-                {{ form }}
+                {{ form.body }}
             </form>
         </div>
     </div>
