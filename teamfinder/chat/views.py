@@ -6,19 +6,23 @@ from chat.models import *
 from chat.forms import *
 from teamfinder_app.models import Team, TeamMember
 
-@login_required
+@login_required(login_url="/login")
 def chat_view(request, group_id):
     user = request.user
     chat_list = ChatGroup.objects.filter(members=user)
 
-    if not chat_list:
-        return render(request, 'no_chat.html')
+    # if not chat_list:
+    #     return render(request, 'no_chat.html')
 
     if group_id == 'default':
         chat_group = ChatGroup.objects.filter(members=user).first()
         return redirect(f'/chat/{chat_group.group_id}')
 
     chat_group = get_object_or_404(ChatGroup, group_id=group_id)
+
+    # if chat_group not in chat_list:
+    #     return render(request, 'pagenotfound.html', status=404)
+
     chat_messages = chat_group.chat_messages.all()[:30]
     form = ChatmessageCreateForm()
     
