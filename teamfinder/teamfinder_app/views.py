@@ -7,7 +7,7 @@ from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamM
 from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
 from chat.models import ChatGroup
 from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from taggit.models import Tag
 from django.db.models import Q, Avg
 import json
@@ -144,19 +144,6 @@ def myaccount(request):
         "form": form,
     }
     return render(request, 'myaccount.html', context)
-
-#upload profile
-@login_required(login_url="/login")
-def upload_profile_image(request):
-    if request.method == 'POST':
-        form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
-        if form.is_valid():
-            form.save()  # Save the updated UserProfile with the new image
-            return redirect('/myaccount')  
-    else:
-        form = ProfileImageUploadForm(instance=request.user.profile)
-
-    return render(request, 'myaccount.html', {'form': form})
 
 #Logout
 def web_logout(request):

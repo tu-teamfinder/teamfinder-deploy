@@ -3,6 +3,10 @@ from django.contrib.auth.models import AbstractUser, User
 from taggit.managers import TaggableManager
 from taggit.models import TagBase, GenericTaggedItemBase
 from django.contrib.auth.base_user import BaseUserManager
+from teamfinder_app.validators import validate_file_size
+from io import BytesIO
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from PIL import Image, UnidentifiedImageError
 
 class CustomUserManager(BaseUserManager):
 
@@ -35,11 +39,36 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-
+    
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_image = models.ImageField(upload_to='', blank=True, null=True, default="fallback.png")
+    profile_image = models.ImageField(upload_to='', blank=True, null=True, default="fallback.png", validators=[validate_file_size])
     bio = models.TextField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if self.profile_image and not self.profile_image.closed:
+            try:
+                img = Image.open(self.profile_image)
+                # Convert PNG with alpha to RGB before resizing
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
+
+            except UnidentifiedImageError:
+                raise ValueError("Invalid image uploaded")
+            
+            # Resize image if necessary
+            if img.height > 600 or img.width > 600:
+                output_size = (600, 600)
+                img.thumbnail(output_size)
+
+                buffer = BytesIO()
+                img.save(buffer, format='JPEG')  # Save as JPEG
+                buffer.seek(0)
+
+                self.profile_image = InMemoryUploadedFile(
+                    buffer, 'ImageField', self.profile_image.name, 'image/jpeg', buffer.tell(), None
+                )
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
