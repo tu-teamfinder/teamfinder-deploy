@@ -143,3 +143,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'teamfinder_app.User'
+
+try:
+    from teamfinder.local_settings import * # type: ignore
+except ImportError:
+    pass
