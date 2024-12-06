@@ -536,6 +536,27 @@ def accept(request, request_id):
     return redirect(f'/team/{team.team_id}')
 
 
+#Decline
+@login_required(login_url="/login")
+def decline(request, request_id):
+    user = request.user
+    req = Request.objects.filter(request_id=request_id).first()
+
+    if (not req):
+        return render(request, 'pagenotfound.html', status=404)
+
+    post = req.post
+
+    if user != post.user:
+        return render(request, 'pagenotfound.html', status=404)
+    
+    req.delete()
+
+    team = Team.objects.get(recruit_post=post)
+
+    return redirect(f'/team/{team.team_id}')
+
+
 #Finish
 @login_required(login_url="/login")
 def finish(request, team_id, is_post_result):
