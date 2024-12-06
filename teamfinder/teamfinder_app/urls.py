@@ -27,4 +27,5 @@ urlpatterns = [
     path('mystats', views.my_stats, name='mystats'),
     path('status/<post_id>', views.toggle_status, name='toggle-status'),
     path('accept/<request_id>', views.accept, name='accept'),
+    path('profile_page/<str:username>', views.profile_page, name='profile_page'),
 ]

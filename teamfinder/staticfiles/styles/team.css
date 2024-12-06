@@ -1,7 +1,15 @@
 .teams-container {
-    margin: 20px 20px 20px 20px;
+    margin: 3rem;
     border: solid 2px rgba(0, 0, 0, 0.1);
     border-radius: 15px;
+}
+
+a{
+    text-decoration: none;
+}
+
+a:hover{
+    text-decoration: none;
 }
 
 h1 {
@@ -15,14 +23,64 @@ h1 {
     grid-template-columns: 1fr 1fr 1fr;
     grid-gap: 2rem;
 }
-.team-box {
-    margin-bottom: 1rem;
-    color: white;
-    border: solid 2px rgba(0, 0, 0, 0.1);
-    border-radius: 15px;
+
+
+/* container */
+.responsive-two-column-grid {
+    display:block;
 }
 
-.team-box:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-    box-shadow: 16px 20px 50px rgba(0, 0, 0, 0.12);
+/* columns */
+.responsive-two-column-grid > * {
+    padding:1rem;
+}
+
+/* tablet breakpoint */
+@media (min-width:768px) {
+    .responsive-two-column-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.card-wrapper{
+    position: absolute;
+    margin-top: 5%;
+    margin-left: 76%;
+    max-width: 340px;
+    width: 98%;
+    padding: 20px;
+    background: #FFF;
+    border-radius: 4px;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    box-shadow: rgba(0, 0, 0, 0.075) 0px 20px 30px 0px;
+}
+
+.text{
+    width: 100%;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.name{
+    font-size: 18px;
+    font-weight: 600px;
+    margin-bottom: 6px;
+}
+
+.message{
+    color: #64686B;
+}
+
+.btn-wrapper{
+    width:100%;
+    margin-top: 20px;
+    display: flex;
+    justify-content:space-evenly;
+}
+
+.btn{
+    transition: all 0.3s ease;
 }

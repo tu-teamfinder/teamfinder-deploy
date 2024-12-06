@@ -1,5 +1,5 @@
 import teamfinder_app.tuapi as tu
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model, get_user
@@ -639,7 +639,7 @@ def feedback(request, team_id):
                 )
                 feedback.save()
                 
-        return redirect('/myaccount')
+        return redirect('/teams')
     
     for member in members:
         feedback_form = FeedbackForm(prefix=f"feedback_{member.username}")
@@ -717,3 +717,10 @@ def message_history(request, receiver):
 #Help
 def help(request):
     return render(request, 'help.html')
+
+@login_required(login_url="/login")
+def profile_page(request, username):
+    user = get_object_or_404(User, username=username)
+    context = {"username": user.username,
+               "userdata": user,}
+    return render(request, 'profile_page.html', {'user': user})

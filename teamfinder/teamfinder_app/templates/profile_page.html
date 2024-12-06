@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+{% block content %}
+    <h1>{{ user.name }}'s Profile</h1>
+    {% if user.profile.profile_image %}
+        <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s Profile Picture" class="profile-pic">
+    {% else %}
+        <img src="/media/images/fallback.png" alt="Default Profile Picture" class="profile-pic">
+    {% endif %}
+    <p><strong>Major:</strong> {{ user.major }}</p>
+    <p><strong>Faculty:</strong> {{ user.faculty }}</p>
+    <p><strong>Year:</strong> {{ user.year }}</p>
+{% endblock %}
