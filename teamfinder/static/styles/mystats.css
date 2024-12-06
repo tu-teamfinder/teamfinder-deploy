@@ -1,0 +1,36 @@
+.chart{
+    width: 350px; 
+    height: 350px; 
+    margin-top: 20px; 
+    margin-left: auto; 
+    margin-right: auto; 
+    border: solid 2px rgba(0, 0, 0, 0.1); 
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.feedback-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.feedback-card {
+    background: #f9f9f9;
+    padding: 16px;
+    border: solid 2px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: left;
+}
+
+.feedback-card ul {
+    list-style: none;
+    padding: 0;
+}
+  
+.feedback-card li {
+    margin-bottom: 8px;
+    font-size: 16px;
+}

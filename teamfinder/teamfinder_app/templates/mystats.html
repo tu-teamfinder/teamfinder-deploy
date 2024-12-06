@@ -1,29 +1,38 @@
 {% extends 'base.html' %}
-
+{% load static %}
 {% block head%}
+    <link rel="stylesheet" href="{% static 'styles/mystats.css' %}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {%endblock%}
 
 {% block content %}
-    <div style="width: 600px; height: 600px; margin-left: auto; margin-right: auto;">
+    <div class="chart">
         <canvas id="radarChart"></canvas>
     </div>
-    <div style="margin-left: 20px;">
+
+    <div style="margin: 16px 20px;">
         <h2>Feedback Received:</h2>
-        <ul>
-            {% for fb in feedback %}
-                <h3>from post {{ fb.team.recruit_post.heading }}</h3>
-                <li>communication point: {{ fb.communication_pt }}</li>
-                <li>collaboration point: {{ fb.collaboration_pt }}</li>
-                <li>reliability point: {{ fb.reliability_pt }}</li>
-                <li>technical point: {{ fb.technical_pt }}</li>
-                <li>empathy point: {{ fb.empathy_pt }}</li>
-                <li>comment point: {{ fb.comment }}</li>
-            {% empty %}
-                <li>No feedback yet.</li>
-            {% endfor %}
-        </ul>
-    </div>  
+    </div>
+
+    <div class="feedback-grid">
+        {% for fb in feedback %}
+          <div class="feedback-card">
+            <h3>From Post: {{ fb.team.recruit_post.heading }}</h3>
+            <ul>
+              <li><i class="fa fa-comments"></i> <strong>Communication:</strong> {{ fb.communication_pt }}</li>
+              <li><i class="fa fa-users"></i> <strong>Collaboration:</strong> {{ fb.collaboration_pt }}</li>
+              <li><i class="fa fa-check-circle"></i> <strong>Reliability:</strong> {{ fb.reliability_pt }}</li>
+              <li><i class="fa fa-laptop-code"></i> <strong>Technical Skills:</strong> {{ fb.technical_pt }}</li>
+              <li><i class="fa fa-heart"></i> <strong>Empathy:</strong> {{ fb.empathy_pt }}</li>
+              <li><strong>Comment:</strong> "{{ fb.comment }}"</li>
+            </ul>
+          </div>
+        {% empty %}
+          <p>No feedback yet.</p>
+        {% endfor %}
+      </div>
+    </div>
+
     <script>
         const ctx = document.getElementById('radarChart').getContext('2d');
         const radarChart = new Chart(ctx, {
