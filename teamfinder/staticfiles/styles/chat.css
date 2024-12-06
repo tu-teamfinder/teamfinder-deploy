@@ -1,0 +1,17 @@
+#main_content {
+    height: calc(100vh - 3.5rem);
+}
+
+span {
+    color: black;
+}
+
+#chat_container {
+    overflow-y: scroll; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none; 
+}
+
+#chat_container::-webkit-scrollbar {
+    display: none;
+}
