@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Feedback{% endblock %}
+{% block content %}
+<div class="container mt-5">
+    <h2>Feedback for Team Members</h2>
+    <p>Please provide feedback for your team members.</p>
+    <form method="post">
+        {% csrf_token %}
+        <div class="accordion" id="feedbackAccordion">
+            {% for username, form in feedback_forms.items %}
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="heading-{{ username }}">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-{{ username }}" aria-expanded="false" aria-controls="collapse-{{ username }}">
+                            Feedback for {{ username }}
+                        </button>
+                    </h2>
+                    <div id="collapse-{{ username }}" class="accordion-collapse collapse" aria-labelledby="heading-{{ username }}" data-bs-parent="#feedbackAccordion">
+                        <div class="accordion-body">
+                            <div class="mb-3">
+                                {{ form.communication_pt.label_tag }}
+                                {{ form.communication_pt }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.collaboration_pt.label_tag }}
+                                {{ form.collaboration_pt }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.reliability_pt.label_tag }}
+                                {{ form.reliability_pt }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.technical_pt.label_tag }}
+                                {{ form.technical_pt }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.empathy_pt.label_tag }}
+                                {{ form.empathy_pt }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form.comment.label_tag }}
+                                {{ form.comment }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Submit Feedback</button>
+    </form>
+</div>
+{% endblock %}
