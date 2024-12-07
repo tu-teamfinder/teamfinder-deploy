@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model, get
 from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, RecruitPost
 from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
 from chat.models import ChatGroup
-from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm, RecruitPostEditForm, ResultPostEditForm
+from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from taggit.models import Tag
 from django.db.models import Q, Avg
@@ -743,43 +743,117 @@ def profile_page(request, username):
     return render(request, 'profile_page.html', {'user': user})
 
 @login_required(login_url="/login")
-def edit_recruit_post(request, post_id):
+def edit_recruitment(request, post_id):
     user = request.user
-    recruit_post = get_object_or_404(RecruitPost, post__post_id=post_id)
-    if user != recruit_post.post.user:
+    recruit = RecruitPost.objects.filter(post_id=post_id).first()
+    tag_list = list(Tag.objects.values_list('name', flat=True))
+    if user != recruit.post.user or not recruit:
         return render(request, 'pagenotfound.html', status=404)
     
-    post_instance = recruit_post.post
     if request.method == 'POST':
-        form = RecruitPostEditForm(request.POST, instance=recruit_post, post_instance=post_instance)
-        if form.is_valid():
-            form.save(post_instance=post_instance)  # Save both Post and RecruitPost data
-            return redirect('myaccount')  # Redirect to a relevant page after saving
-    else:
-        # Populate form with existing data
-        form = RecruitPostEditForm(instance=recruit_post, post_instance=post_instance)
+        heading = request.POST.get('heading')
+        content = request.POST.get('content')
+        tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
+        invalid = False
 
-    return render(request, 'edit_recruit_post.html', {'form': form, 'recruit_post': recruit_post})
+        if not heading.strip():
+            invalid = True
+            messages.error(request, 'Please enter heading')
+
+        if not content.strip():
+            invalid = True
+            messages.error(request, 'Please enter content')
+
+        if len(tags) > 3:
+            invalid = True
+            messages.error(request, 'Only 3 tags can use')
+
+        if invalid:
+            context = {
+                "heading": heading,
+                "content": content,
+                "tags": request.POST.get('tags'),
+                "tag_list": tag_list,
+            }
+
+            return render(request, 'edit_recruitment.html', context)
+        
+        post = recruit.post
+        post.heading = heading
+        post.content = content
+        post.save()
+
+        recruit.tag.set(tags)
+        recruit.save()
+
+        return redirect(f'/post/{post_id}')
+
+    tags = ", ".join(recruit.tag.values_list('name', flat=True))
+    post = recruit.post
+
+    context = {
+        "heading": post.heading,
+        "content": post.content,
+        "tags" : tags,
+        "tag_list" : tag_list
+    }
+
+    return render(request, 'edit_recruitment.html', context)
 
 @login_required(login_url="/login")
-def edit_result_post(request, post_id):
+def edit_result(request, post_id):
     user = request.user
-    result_post = get_object_or_404(ResultPost, post__post_id=post_id)
-    if user != result_post.post.user:
+    result = RecruitPost.objects.filter(post_id=post_id).first()
+    tag_list = list(Tag.objects.values_list('name', flat=True))
+    if user != result.post.user or not result:
         return render(request, 'pagenotfound.html', status=404)
-    # Fetch the ResultPost and related Post instance
-    result_post = get_object_or_404(ResultPost, post__post_id=post_id)
-    post_instance = result_post.post
-
+    
     if request.method == 'POST':
-        # Create form instance with the provided POST data
-        form = ResultPostEditForm(request.POST, instance=result_post, post_instance=post_instance)
-        if form.is_valid():
-            # Save changes to both Post and ResultPost
-            form.save(post_instance=post_instance)
-            return redirect('myaccount')  # Redirect after saving
-    else:
-        # Pre-fill the form with existing data
-        form = ResultPostEditForm(instance=result_post, post_instance=post_instance)
+        heading = request.POST.get('heading')
+        content = request.POST.get('content')
+        tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
+        invalid = False
 
-    return render(request, 'edit_result_post.html', {'form': form, 'result_post': result_post})
+        if not heading.strip():
+            invalid = True
+            messages.error(request, 'Please enter heading')
+
+        if not content.strip():
+            invalid = True
+            messages.error(request, 'Please enter content')
+
+        if len(tags) > 3:
+            invalid = True
+            messages.error(request, 'Only 3 tags can use')
+
+        if invalid:
+            context = {
+                "heading": heading,
+                "content": content,
+                "tags": request.POST.get('tags'),
+                "tag_list": tag_list,
+            }
+
+            return render(request, 'edit_result.html', context)
+        
+        post = result.post
+        post.heading = heading
+        post.content = content
+        post.save()
+
+        result.tag.set(tags)
+        result.save()
+
+        return redirect(f'/post/{post_id}')
+
+    tags = ", ".join(result.tag.values_list('name', flat=True))
+    post = result.post
+
+    context = {
+        "heading": post.heading,
+        "content": post.content,
+        "tags" : tags,
+        "tag_list" : tag_list
+    }
+
+    return render(request, 'edit_result.html', context)

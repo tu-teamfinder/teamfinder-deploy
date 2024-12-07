@@ -28,6 +28,6 @@ urlpatterns = [
     path('status/<post_id>', views.toggle_status, name='toggle-status'),
     path('accept/<request_id>', views.accept, name='accept'),
     path('profile_page/<str:username>', views.profile_page, name='profile_page'),
-    path('edit_recruit_post/<post_id>', views.edit_recruit_post, name='edit_recruit_post'),
-     path('edit_result_post/<post_id>', views.edit_result_post, name='edit_result_post'),
+    path('recruitment/edit/<post_id>', views.edit_recruitment, name='edit_recruitment'),
+     path('result/edit/<post_id>', views.edit_result, name='edit_result'),
 ]
