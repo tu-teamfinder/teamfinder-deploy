@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model, get_user
-from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team
+from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, RecruitPost
 from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
 from chat.models import ChatGroup
 from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm
@@ -120,6 +120,7 @@ def web_login(request):
 def myaccount(request):
     user = request.user
     created_post = RecruitPost.objects.filter(post__user=user)
+    created_post = [post for post in created_post if post.status == True]
     current_joinedteams = TeamMember.objects.filter(member=user)
     current_leadteams = Team.objects.filter(team_leader=user)
     resultpost = ResultPost.objects.filter(post__user=user)
@@ -176,11 +177,8 @@ def my_stats(request):
 #Recruitment Post
 @login_required(login_url="/login")
 def recruitment(request):
-    recruit_posts = RecruitPost.objects.filter(status=True)
-
-    posts = []
-    for post in recruit_posts:
-        posts.append(post.post)
+    posts = RecruitPost.objects.select_related('post').prefetch_related('tag')
+    posts = [post for post in posts if post.status == True]
 
     tag_list = list(Tag.objects.values_list('name', flat=True))
 
@@ -195,12 +193,7 @@ def recruitment(request):
 #Result Post
 @login_required(login_url="/login")
 def result(request):
-    result_posts = ResultPost.objects.all()
-
-    posts = []
-    for post in result_posts:
-        posts.append(post.post)
-
+    posts = ResultPost.objects.select_related('post').prefetch_related('tag')
     tag_list = list(Tag.objects.values_list('name', flat=True))
 
     context = {
@@ -685,7 +678,8 @@ def feedback(request, team_id):
 def search_recruit(request):
     if request.method == "POST":
         search = request.POST.get('search')
-
+        tag_list = list(Tag.objects.values_list('name', flat=True))
+    
         if search.strip():
             search = [s.strip() for s in search.split(',') if s.strip()]
             query = Q()
@@ -693,15 +687,13 @@ def search_recruit(request):
             for tag in search:
                 query |= Q(tag__name__icontains=tag)
 
-            recruits = RecruitPost.objects.filter(query)
-
-            posts = []
-            for post in recruits:
-                posts.append(post.post)
+            posts = RecruitPost.objects.filter(query, status=True).distinct()
 
             context = {
                 "posts": posts,
+                "tag_list": tag_list,
             }
+            
 
             return render(request, 'recruitment.html', context)
 
@@ -712,6 +704,7 @@ def search_recruit(request):
 def search_result(request):
     if request.method == "POST":
         search = request.POST.get('search')
+        tag_list = list(Tag.objects.values_list('name', flat=True))
 
         if search.strip():
             search = [s.strip() for s in search.split(',') if s.strip()]
@@ -720,14 +713,11 @@ def search_result(request):
             for tag in search:
                 query |= Q(tag__name__icontains=tag)
 
-            results = ResultPost.objects.filter(query)
-
-            posts = []
-            for post in results:
-                posts.append(post.post)
-
+            posts = ResultPost.objects.filter(query).distinct()
+ 
             context = {
                 "posts": posts,
+                "tag_list": tag_list,
             }
 
             return render(request, 'result.html', context)
@@ -751,3 +741,119 @@ def profile_page(request, username):
     context = {"username": user.username,
                "userdata": user,}
     return render(request, 'profile_page.html', {'user': user})
+
+@login_required(login_url="/login")
+def edit_recruitment(request, post_id):
+    user = request.user
+    recruit = RecruitPost.objects.filter(post_id=post_id).first()
+    tag_list = list(Tag.objects.values_list('name', flat=True))
+    if user != recruit.post.user or not recruit:
+        return render(request, 'pagenotfound.html', status=404)
+    
+    if request.method == 'POST':
+        heading = request.POST.get('heading')
+        content = request.POST.get('content')
+        tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
+        invalid = False
+
+        if not heading.strip():
+            invalid = True
+            messages.error(request, 'Please enter heading')
+
+        if not content.strip():
+            invalid = True
+            messages.error(request, 'Please enter content')
+
+        if len(tags) > 3:
+            invalid = True
+            messages.error(request, 'Only 3 tags can use')
+
+        if invalid:
+            context = {
+                "heading": heading,
+                "content": content,
+                "tags": request.POST.get('tags'),
+                "tag_list": tag_list,
+            }
+
+            return render(request, 'edit_recruitment.html', context)
+        
+        post = recruit.post
+        post.heading = heading
+        post.content = content
+        post.save()
+
+        recruit.tag.set(tags)
+        recruit.save()
+
+        return redirect(f'/post/{post_id}')
+
+    tags = ", ".join(recruit.tag.values_list('name', flat=True))
+    post = recruit.post
+
+    context = {
+        "heading": post.heading,
+        "content": post.content,
+        "tags" : tags,
+        "tag_list" : tag_list
+    }
+
+    return render(request, 'edit_recruitment.html', context)
+
+@login_required(login_url="/login")
+def edit_result(request, post_id):
+    user = request.user
+    result = RecruitPost.objects.filter(post_id=post_id).first()
+    tag_list = list(Tag.objects.values_list('name', flat=True))
+    if user != result.post.user or not result:
+        return render(request, 'pagenotfound.html', status=404)
+    
+    if request.method == 'POST':
+        heading = request.POST.get('heading')
+        content = request.POST.get('content')
+        tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
+        invalid = False
+
+        if not heading.strip():
+            invalid = True
+            messages.error(request, 'Please enter heading')
+
+        if not content.strip():
+            invalid = True
+            messages.error(request, 'Please enter content')
+
+        if len(tags) > 3:
+            invalid = True
+            messages.error(request, 'Only 3 tags can use')
+
+        if invalid:
+            context = {
+                "heading": heading,
+                "content": content,
+                "tags": request.POST.get('tags'),
+                "tag_list": tag_list,
+            }
+
+            return render(request, 'edit_result.html', context)
+        
+        post = result.post
+        post.heading = heading
+        post.content = content
+        post.save()
+
+        result.tag.set(tags)
+        result.save()
+
+        return redirect(f'/post/{post_id}')
+
+    tags = ", ".join(result.tag.values_list('name', flat=True))
+    post = result.post
+
+    context = {
+        "heading": post.heading,
+        "content": post.content,
+        "tags" : tags,
+        "tag_list" : tag_list
+    }
+
+    return render(request, 'edit_result.html', context)

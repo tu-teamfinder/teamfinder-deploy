@@ -1,6 +1,6 @@
 from django import forms
 from .models import UserProfile, User
-from teamfinder_app.models import Feedback
+from teamfinder_app.models import Feedback, RecruitPost, ResultPost, Post
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 
@@ -67,4 +67,3 @@ class FeedbackForm(forms.ModelForm):
         widget=forms.Textarea(attrs={'rows': 3}),
         required=False,
     )
-
