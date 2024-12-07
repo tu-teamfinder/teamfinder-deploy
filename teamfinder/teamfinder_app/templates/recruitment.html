@@ -5,12 +5,13 @@
 <link rel="stylesheet" href="{% static "styles/recruit.css" %}">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
 <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 {%endblock%}
 {% block nav %}
-<form class="d-flex mx-auto" action="{% url 'search_recruit' %}" method="POST" style="width: 40%;">
+<form id="search-bar" action="{% url 'search_recruit' %}" method="POST">
     {% csrf_token %}
-    <input class="form-control me-sm-2" placeholder="Search" name="search" required>
-    <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+    <input type="text" name="search" placeholder="Search by tag" required>
+    <button type="submit"><i class='bx bx-search bx-xs'></i></button>
 </form>
 {% endblock %}
 {% block content %}
@@ -22,10 +23,10 @@
             <div class="blog-box">
                 <!--text-->
                 <div class="blog-box-text">
-                    <!--author-->
+                    <!-- tag  -->
                     <div>
                         {% for tag in post.tag.all %}
-                        <button class="search-tag-btn btn btn-secondary" data-tag="{{ tag.name }}" data-form-id="form-{{ post.post_id }}">{{ tag.name }}</button>
+                        <button id="tag" class="btn btn-secondary btn-sm" data-tag="{{ tag.name }}" data-form-id="form-{{ post.post_id }}">{{ tag.name }}</button>
                         {% endfor %}
                     </div>
             
@@ -34,8 +35,10 @@
                         {% csrf_token %}
                         <input type="hidden" name="search" id="search-input-{{ post.post_id }}">
                     </form>
+
+                    <!--author-->
                     <div class="blog-author-text">
-                        <a href="profile_page/{{user.username}}" target="_blank">
+                        <a href="/profile_page/{{user.username}}" target="_blank">
                         {% if user.profile.profile_image %}
                         <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s Profile Picture" class="profile-pic">
                         {% else %}
