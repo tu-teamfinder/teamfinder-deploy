@@ -178,30 +178,16 @@ def my_stats(request):
 @login_required(login_url="/login")
 def recruitment(request):
     posts = RecruitPost.objects.select_related('post').prefetch_related('tag')
-    print("!!!!")
-    print(posts)
-
+    posts = [post for post in posts if post.status == True]
     return render(request, 'recruitment.html', {'posts': posts})
-
 
 
 #Result Post
 @login_required(login_url="/login")
 def result(request):
-    result_posts = ResultPost.objects.all()
+    posts = ResultPost.objects.select_related('post').prefetch_related('tag')
 
-    posts = []
-    for post in result_posts:
-        posts.append(post.post)
-
-    tag_list = list(Tag.objects.values_list('name', flat=True))
-
-    context = {
-        "posts": posts,
-        "tag_list": tag_list
-    }
-
-    return render(request, 'result.html', context)
+    return render(request, 'recruitment.html', {'posts': posts})
 
 
 #Post

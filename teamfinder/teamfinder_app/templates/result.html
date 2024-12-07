@@ -23,6 +23,11 @@
                 <!--text-->
                 <div class="blog-box-text">
                     <!--author-->
+                    <div>
+                        {% for tag in post.tag.all %}
+                        <a href="/recruitment/search/{{tag.name}}">{{ tag.name }}</a>
+                        {% endfor %}
+                    </div>
                     <div class="blog-author-text">
                         <a href="profile_page/{{user.username}}" target="_blank">
                         {% if user.profile.profile_image %}
@@ -30,17 +35,17 @@
                         {% else %}
                         <img src="/media/images/fallback.png" alt="Default Profile Picture" class="profile-pic">
                         {% endif %}
-                        <strong>{{post.user.name}}</strong>
+                        <strong>{{post.post.user.name}}</strong>
                         </a>
                     </div>
                     <div class="blog-author" >
                         <div class="blog-author-text">
-                            {{post.timestamp}}
+                            {{post.post.timestamp}}
                         </div>
                     </div>
                     <!--heading-->
-                    <a href="{% url 'post' post.post_id%}"> {{post.heading}} </a>
-                    <p> {{post.content}} <br></p>
+                    <a href="{% url 'post' post.post_id%}"> {{post.post.heading}} </a>
+                    <p>{{post.post.content}}</p>
                 </div>
             </div>
             {% endfor %}
