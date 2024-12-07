@@ -23,10 +23,19 @@
                 <!--text-->
                 <div class="blog-box-text">
                     <!--author-->
+                    <div class="blog-author-text">
+                        <a href="profile_page/{{user.username}}" target="_blank">
+                        {% if user.profile.profile_image %}
+                        <img src="{{ user.profile.profile_image.url }}" alt="{{ user.username }}'s Profile Picture" class="profile-pic">
+                        {% else %}
+                        <img src="/media/images/fallback.png" alt="Default Profile Picture" class="profile-pic">
+                        {% endif %}
+                        <strong>{{post.user.name}}</strong>
+                        </a>
+                    </div>
                     <div class="blog-author" >
                         <div class="blog-author-text">
-                            <strong>{{post.user.name}}</strong>
-                            <span> {{post.timestamp}}</span>
+                            {{post.timestamp}}
                         </div>
                     </div>
                     <!--heading-->
