@@ -535,7 +535,7 @@ def accept(request, request_id):
         team=team,
         member=req.user
     )
-
+    req.delete()
     chat_group = ChatGroup.objects.filter(team=team).first()
     chat_group.members.add(req.user)
 
