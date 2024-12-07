@@ -1,6 +1,6 @@
 from django import forms
 from .models import UserProfile, User
-from teamfinder_app.models import Feedback, RecruitPost
+from teamfinder_app.models import Feedback, RecruitPost, ResultPost, Post
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 
@@ -95,4 +95,33 @@ class RecruitPostEditForm(forms.ModelForm):
                 post_instance.save()
 
         # Save changes to RecruitPost model
+        return super().save(commit=commit)
+
+class ResultPostEditForm(forms.ModelForm):
+    heading = forms.CharField(max_length=255)  # From Post model
+    content = forms.CharField(widget=forms.Textarea)  # From Post model
+
+    class Meta:
+        model = ResultPost
+        fields = ['tag']  # From ResultPost model
+
+    def __init__(self, *args, **kwargs):
+        # Fetch the related Post instance data
+        post_instance = kwargs.pop('post_instance', None)
+        super().__init__(*args, **kwargs)
+
+        if post_instance:
+            # Pre-fill the fields with Post data
+            self.fields['heading'].initial = post_instance.heading
+            self.fields['content'].initial = post_instance.content
+
+    def save(self, post_instance=None, commit=True):
+        # Save changes to the Post model
+        if post_instance:
+            post_instance.heading = self.cleaned_data['heading']
+            post_instance.content = self.cleaned_data['content']
+            if commit:
+                post_instance.save()
+
+        # Save changes to the ResultPost model
         return super().save(commit=commit)

@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout, get_user_model, get
 from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, RecruitPost
 from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
 from chat.models import ChatGroup
-from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm, RecruitPostEditForm
+from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm, RecruitPostEditForm, ResultPostEditForm
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from taggit.models import Tag
 from django.db.models import Q, Avg
@@ -753,7 +753,7 @@ def profile_page(request, username):
                "userdata": user,}
     return render(request, 'profile_page.html', {'user': user})
 
-@login_required
+@login_required(login_url="/login")
 def edit_recruit_post(request, post_id):
     user = request.user
     recruit_post = get_object_or_404(RecruitPost, post__post_id=post_id)
@@ -771,3 +771,26 @@ def edit_recruit_post(request, post_id):
         form = RecruitPostEditForm(instance=recruit_post, post_instance=post_instance)
 
     return render(request, 'edit_recruit_post.html', {'form': form, 'recruit_post': recruit_post})
+
+@login_required(login_url="/login")
+def edit_result_post(request, post_id):
+    user = request.user
+    result_post = get_object_or_404(ResultPost, post__post_id=post_id)
+    if user != result_post.post.user:
+        return render(request, 'pagenotfound.html', status=404)
+    # Fetch the ResultPost and related Post instance
+    result_post = get_object_or_404(ResultPost, post__post_id=post_id)
+    post_instance = result_post.post
+
+    if request.method == 'POST':
+        # Create form instance with the provided POST data
+        form = ResultPostEditForm(request.POST, instance=result_post, post_instance=post_instance)
+        if form.is_valid():
+            # Save changes to both Post and ResultPost
+            form.save(post_instance=post_instance)
+            return redirect('myaccount')  # Redirect after saving
+    else:
+        # Pre-fill the form with existing data
+        form = ResultPostEditForm(instance=result_post, post_instance=post_instance)
+
+    return render(request, 'edit_result_post.html', {'form': form, 'result_post': result_post})
