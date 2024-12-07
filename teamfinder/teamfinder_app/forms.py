@@ -8,14 +8,14 @@ class CustomUserCreationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ("username", "email", "name", "major", "faculty", "year")
+        fields = ("username", "email_address", "name", "major", "faculty", "year")
 
 
 class CustomUserChangeForm(UserChangeForm):
 
     class Meta:
         model = User
-        fields = ("username", "email", "name", "major", "faculty", "year")
+        fields = ("username", "email_address", "name", "major", "faculty", "year")
 
 
 class RequestMessageForm(forms.Form):

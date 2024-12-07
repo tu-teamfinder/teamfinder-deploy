@@ -182,8 +182,11 @@ def recruitment(request):
     for post in recruit_posts:
         posts.append(post.post)
 
+    tag_list = list(Tag.objects.values_list('name', flat=True))
+
     context = {
         "posts": posts,
+        "tag_list": tag_list
     }
 
     return render(request, 'recruitment.html', context)
@@ -198,8 +201,11 @@ def result(request):
     for post in result_posts:
         posts.append(post.post)
 
+    tag_list = list(Tag.objects.values_list('name', flat=True))
+
     context = {
-        "posts": posts
+        "posts": posts,
+        "tag_list": tag_list
     }
 
     return render(request, 'result.html', context)
@@ -678,7 +684,7 @@ def feedback(request, team_id):
 #Search-recruit no search by requirement
 def search_recruit(request):
     if request.method == "POST":
-        search = request.POST.get('seacrh')
+        search = request.POST.get('search')
 
         if search.strip():
             search = [s.strip() for s in search.split(',') if s.strip()]
@@ -705,7 +711,7 @@ def search_recruit(request):
 #Search-result
 def search_result(request):
     if request.method == "POST":
-        search = request.POST.get('seacrh')
+        search = request.POST.get('search')
 
         if search.strip():
             search = [s.strip() for s in search.split(',') if s.strip()]
