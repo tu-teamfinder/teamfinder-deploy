@@ -28,4 +28,5 @@ urlpatterns = [
     path('status/<post_id>', views.toggle_status, name='toggle-status'),
     path('accept/<request_id>', views.accept, name='accept'),
     path('profile_page/<str:username>', views.profile_page, name='profile_page'),
+    path('edit_recruit_post/<post_id>', views.edit_recruit_post, name='edit_recruit_post')
 ]

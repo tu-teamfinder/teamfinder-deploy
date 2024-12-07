@@ -46,4 +46,20 @@
       </div>
     </div>
 </div>
+
+{% if created_post %}
+<ul>
+    {% for crp in created_post %}
+        <li>
+          <a href="">edit</a>
+            <h2>{{ crp.post.heading }}</h2>
+            <p>{{ crp.post.content }}</p>
+            <small>Created on: {{ crp.post.timestamp }}</small>
+        </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>You haven't created any posts yet.</p>
+{% endif %}
+
 {% endblock %}

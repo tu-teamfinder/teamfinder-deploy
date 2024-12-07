@@ -3,10 +3,10 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, get_user_model, get_user
-from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team
+from teamfinder_app.models import Post, RecruitPost, ResultPost, Feedback, TeamMember, Team, RecruitPost
 from teamfinder_app.models import UserProfile, Requirement, Faculty, Major, Request, PostComment
 from chat.models import ChatGroup
-from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm
+from teamfinder_app.forms import RequestMessageForm, ProfileImageUploadForm, FeedbackForm, RecruitPostEditForm
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from taggit.models import Tag
 from django.db.models import Q, Avg
@@ -120,6 +120,7 @@ def web_login(request):
 def myaccount(request):
     user = request.user
     created_post = RecruitPost.objects.filter(post__user=user)
+    created_post = [post for post in created_post if post.status == True]
     current_joinedteams = TeamMember.objects.filter(member=user)
     current_leadteams = Team.objects.filter(team_leader=user)
     resultpost = ResultPost.objects.filter(post__user=user)
@@ -751,3 +752,22 @@ def profile_page(request, username):
     context = {"username": user.username,
                "userdata": user,}
     return render(request, 'profile_page.html', {'user': user})
+
+@login_required
+def edit_recruit_post(request, post_id):
+    user = request.user
+    recruit_post = get_object_or_404(RecruitPost, post__post_id=post_id)
+    if user != recruit_post.post.user or not recruit_post.status:
+        return render(request, 'pagenotfound.html', status=404)
+    
+    post_instance = recruit_post.post
+    if request.method == 'POST':
+        form = RecruitPostEditForm(request.POST, instance=recruit_post, post_instance=post_instance)
+        if form.is_valid():
+            form.save(post_instance=post_instance)  # Save both Post and RecruitPost data
+            return redirect('myaccount')  # Redirect to a relevant page after saving
+    else:
+        # Populate form with existing data
+        form = RecruitPostEditForm(instance=recruit_post, post_instance=post_instance)
+
+    return render(request, 'edit_recruit_post.html', {'form': form, 'recruit_post': recruit_post})
