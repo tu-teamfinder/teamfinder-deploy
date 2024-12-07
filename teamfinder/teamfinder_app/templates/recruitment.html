@@ -9,8 +9,8 @@
 {% block nav %}
 <form class="d-flex mx-auto" action="{% url 'search_recruit' %}" method="POST" style="width: 40%;">
     {% csrf_token %}
-    <input class="form-control me-2" placeholder="" name="search" required>
-    <button class="btn btn-light" type="submit">Search</button>
+    <input class="form-control me-sm-2" placeholder="Search" name="search" required>
+    <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
 </form>
 {% endblock %}
 {% block content %}

@@ -22,58 +22,96 @@
     </div>
 </div>
 
-<div class="card-wrapper">
-    <div class="text">
-        <div class="name">Test</div>
-        <div class="message">Sawaddee Krub</div>
-    </div>
-    <div class="btn-wrapper">
-        <button class="btn btn-light">Later</button>
-        <button class="btn btn-secondary">Accept</button>
-    </div>
-</div>
-
-
-
-<div class="number"><p>1</p></div>
-<div class=container>
-    <div class="card bg-light mb-3" style="margin:200px; padding:1rem;">
-        <h2>Team Details</h2>
-        <div class="card-body">
-            <!-- Team Information -->
-                <div class="team-info">
-                    <p style="display: inline-block;;"><strong>Post Status:</strong> {% if is_finish %}Finished{% else %}Active{% endif %}</p>
-                    <span><a href="{% url 'post' team.recruit_post.post_id%}">Go to Post</a></span>
-                </div>
-
-            <!-- Team Members List -->
-            <div class="team-members">
-                <h3>Team Members</h3>
-                <ul>
-                    {% for member in members %}
-                        <li>{{ member.username }}</li>
-                    {% empty %}
-                        <p>No members found.</p>
-                    {% endfor %}
-                </ul>
-            </div>
-        
-        <!-- Finished Team Section -->
-        {% if is_finish %}
-            <div class="finished-team">
-                <h3>This Team's Recruitment Post is Finished</h3>
-                <p>No further actions can be taken on this team.</p>
-            </div>
-
+<ul class="nav nav-tabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <a class="nav-link active" data-bs-toggle="tab" href="#home" aria-selected="true" role="tab">Team Details</a>
+    </li>
+    <li class="nav-item" role="presentation">
+        {%if is_finish%}
+        <a class="nav-link disabled" href="#" aria-selected="false" tabindex="-1" role="tab">Notifications</a>
         {%else%}
-            {%if is_owner%}
-            <div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
-                Finish
-            </button></div>
-            {% endif %}
-        {% endif %}
+        <a class="nav-link" data-bs-toggle="tab" href="#profile" aria-selected="false" role="tab" tabindex="-1">Notifications</a>
+        {%endif%}
+    </li>
+  </ul>
+
+  <div id="myTabContent" class="tab-content">
+    <div class="tab-pane fade active show" id="home" role="tabpanel">
+        <div class=container>
+            <div class="card bg-light mb-3" style="margin:200px; padding:1rem;">
+                <h2>Team Details</h2>
+                <div class="card-body">
+                    <!-- Team Information -->
+                        <div class="team-info">
+                            <p style="display: inline-block;;"><strong>Post Status:</strong> {% if is_finish %}Finished{% else %}Active{% endif %}</p>
+                            <span><a href="{% url 'post' team.recruit_post.post_id%}">Go to Post</a></span>
+                        </div>
+        
+                    <!-- Team Members List -->
+                    <div class="team-members">
+                        <h3>Team Members</h3>
+                        <ul>
+                            {% for member in members %}
+                                <li>{{ member.username }}</li>
+                            {% empty %}
+                                <p>No members found.</p>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                
+                <!-- Finished Team Section -->
+                {% if is_finish %}
+                    <div class="finished-team">
+                        <h3>This Team's Recruitment Post is Finished</h3>
+                        <p>No further actions can be taken on this team.</p>
+                    </div>
+        
+                {%else%}
+                    {%if is_owner%}
+                    <div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
+                        Finish
+                    </button></div>
+                    {% endif %}
+                {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-</div>
+    <div class="tab-pane fade" id="profile" role="tabpanel">
+        <section class="section-50">
+            <div class="container">
+                <h3 class="m-b-50 heading-line">Notifications <i class="fa fa-bell text-muted"></i></h3>
+                <div class="notification-ui_dd-content">
+                    {%for request in request_list%}
+                    <div class="notification-list notification-list--unread">
+                        <div class="notification-list_content">
+                            <div class="notification-list_detail">
+                                <p><b>{{request.user}}</b> request to your post</p>
+                                <p class="text-muted">{{request.message}}</p>
+                            </div>
+                        </div>
+                        <div class="notification-list_feature-img">
+                            <button type="button" class="btn btn-success">Accept</button>
+                            <button type="button" class="btn btn-danger">Cancle</button>
+                        </div>
+                    </div>
+                    {%empty%}
+                    <p>No notification<p>
+                    {%endfor%}
+                </div>
+        
+
+        
+            </div>
+        </section>
+    </div>
+
+  </div>
+
+
+
+
+
 {%block javascript%}
 {%endblock%}
 {% endblock %}
