@@ -746,7 +746,7 @@ def profile_page(request, username):
 def edit_recruit_post(request, post_id):
     user = request.user
     recruit_post = get_object_or_404(RecruitPost, post__post_id=post_id)
-    if user != recruit_post.post.user or not recruit_post.status:
+    if user != recruit_post.post.user:
         return render(request, 'pagenotfound.html', status=404)
     
     post_instance = recruit_post.post
