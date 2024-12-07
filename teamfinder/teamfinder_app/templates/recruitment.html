@@ -25,9 +25,15 @@
                     <!--author-->
                     <div>
                         {% for tag in post.tag.all %}
-                        <a href="/recruitment/search/{{tag.name}}">{{ tag.name }}</a>
+                        <button class="search-tag-btn btn btn-secondary" data-tag="{{ tag.name }}" data-form-id="form-{{ post.post_id }}">{{ tag.name }}</button>
                         {% endfor %}
                     </div>
+            
+                    <!-- Hidden Form -->
+                    <form id="form-{{ post.post_id }}" action="{% url 'search_recruit' %}" method="POST" style="display: none;">
+                        {% csrf_token %}
+                        <input type="hidden" name="search" id="search-input-{{ post.post_id }}">
+                    </form>
                     <div class="blog-author-text">
                         <a href="profile_page/{{user.username}}" target="_blank">
                         {% if user.profile.profile_image %}
@@ -56,6 +62,21 @@
 
 {% block javascript %}
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const buttons = document.querySelectorAll('.search-tag-btn');
+
+    buttons.forEach(button => {
+        button.addEventListener('click', (event) => {
+            const tag = event.target.getAttribute('data-tag'); // Get the tag name
+            const formId = event.target.getAttribute('data-form-id'); // Get the related form ID
+            const form = document.getElementById(formId); // Get the form element dynamically
+            const input = form.querySelector('input[name="search"]'); // Get the input inside the form
+
+            input.value = tag; // Set the tag value in the hidden input
+            form.submit(); // Submit the form
+        });
+    });
+});
     var search = document.querySelector('input[name=search]'),
         whitelist = {{tag_list|safe}};
 
