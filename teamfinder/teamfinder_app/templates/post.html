@@ -78,10 +78,10 @@
     </div>
 </div>
 
-{%if not is_owner%}
-<div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
+{%if not is_owner and requestable%}
+    <div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
     Request
-  </button></div>
+    </button></div>
 {%endif%}
 
 {%if is_owner%}
