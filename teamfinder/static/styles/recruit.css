@@ -86,7 +86,7 @@ ul{
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 .blog-author-text{
@@ -151,4 +151,11 @@ ul{
 
 .round-button:hover{
     background-color: #c3002f; /* Darker blue */
+}
+
+.profile-pic {
+    width: 2.5rem; 
+    height: 2.5rem; 
+    object-fit: cover; /* Ensures the image fits nicely within the defined dimensions */
+    border-radius: 50%; 
 }
