@@ -13,8 +13,8 @@
             <img src="/media/images/fallback.png" alt="Default Profile Picture" class="profile-pic">
         {% endif %}
         <h2>{{ userdata.name|title }}'s Profile</h2>
-        <h3>{{userdata.faculty}}</h3>
-        <h3>{{userdata.major}}</h3>
+        <p><strong>Faculty: </strong>{{userdata.faculty}}</p>
+        <p><strong>Major: </strong>{{userdata.major}}</p>
 
         <div class="container">
             <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">Edit Profile</button>
