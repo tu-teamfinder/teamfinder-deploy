@@ -201,7 +201,7 @@ def result(request):
         "tag_list": tag_list
     }
 
-    return render(request, 'recruitment.html', {'posts': posts})
+    return render(request, 'result.html', context)
 
 
 #Post
