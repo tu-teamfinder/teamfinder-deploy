@@ -488,13 +488,16 @@ def team(request, team_id):
 
     request_list = list(Request.objects.filter(post=team.recruit_post)) if is_owner else []
     
+    chat_group = ChatGroup.objects.get(team=team)
+
     context = {
         "team": team,
         "team_id": team_id,
         "members": members,
         "is_owner": is_owner,
         "is_finish": is_finish,
-        "request_list": request_list
+        "request_list": request_list,
+        "group_id": chat_group.group_id
     }
 
     return render(request, 'team.html', context)
