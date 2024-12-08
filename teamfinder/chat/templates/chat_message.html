@@ -15,7 +15,9 @@
 {% else %}
 <li>
     <div class="tw-flex tw-justify-start">
-        <span class="tw-text-gray-500">{{ message.author.username }}</span>
+        <a href="/profile_page/{{message.author.username}}" target="_blank">
+            <span class="tw-text-gray-500">{{ message.author.username }}</span>
+        </a>
     </div>
     <div class="tw-flex tw-justify-start">
         <a href="/profile_page/{{message.author.username}}" target="_blank">

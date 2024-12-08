@@ -306,9 +306,9 @@ def create_post(request):
             invalid = True
             messages.error(request, 'Please enter content') 
 
-        if len(tags) > 3:
+        if len(tags) > 3 or len(tags) < 1:
             invalid = True
-            messages.error(request, 'Only 3 tags can use')
+            messages.error(request, 'Must be 1-3 tag(s)')
 
         if invalid:
             context = {
@@ -758,9 +758,9 @@ def edit_recruitment(request, post_id):
             invalid = True
             messages.error(request, 'Please enter content')
 
-        if len(tags) > 3:
+        if len(tags) > 3 or len(tags) < 1:
             invalid = True
-            messages.error(request, 'Only 3 tags can use')
+            messages.error(request, 'Must be 1-3 tag(s)')
 
         if invalid:
             context = {
@@ -797,7 +797,7 @@ def edit_recruitment(request, post_id):
 @login_required(login_url="/login")
 def edit_result(request, post_id):
     user = request.user
-    result = RecruitPost.objects.filter(post_id=post_id).first()
+    result = ResultPost.objects.filter(post_id=post_id).first()
     tag_list = list(Tag.objects.values_list('name', flat=True))
     if user != result.post.user or not result:
         return render(request, 'pagenotfound.html', status=404)
@@ -816,9 +816,9 @@ def edit_result(request, post_id):
             invalid = True
             messages.error(request, 'Please enter content')
 
-        if len(tags) > 3:
+        if len(tags) > 3 or len(tags) < 1:
             invalid = True
-            messages.error(request, 'Only 3 tags can use')
+            messages.error(request, 'Must be 1-3 tag(s)')
 
         if invalid:
             context = {
