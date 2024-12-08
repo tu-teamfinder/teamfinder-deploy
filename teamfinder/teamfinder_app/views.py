@@ -295,7 +295,6 @@ def create_post(request):
     if request.method == 'POST':
         heading = request.POST.get('heading')
         content = request.POST.get('content')
-        amount = int(request.POST.get('amount'))
         tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
         invalid = False
 
@@ -305,11 +304,7 @@ def create_post(request):
 
         if not content.strip():
             invalid = True
-            messages.error(request, 'Please enter content')
-
-        if amount > 50 or amount < 1:
-            invalid = True
-            messages.error(request, 'Can recruit 1 to 50')    
+            messages.error(request, 'Please enter content') 
 
         if len(tags) > 3:
             invalid = True
@@ -319,7 +314,6 @@ def create_post(request):
             context = {
                 "heading": heading,
                 "content": content,
-                "amount": amount,
                 "tags": request.POST.get('tags'),
                 "tag_list": tag_list,
             }
@@ -328,7 +322,6 @@ def create_post(request):
 
         request.session['heading'] = heading
         request.session['content'] = content
-        request.session['amount'] = amount
         request.session['tags'] = tags
         request.session['visited_create'] = True
 
@@ -343,7 +336,6 @@ def web_requirement(request):
     user = request.user
     heading = request.session.get('heading')
     content = request.session.get('content')
-    amount = request.session.get('amount')
     tags = request.session.get('tags')
 
     faculty_list = [faculty.name for faculty in Faculty.objects.all()]
@@ -391,7 +383,6 @@ def web_requirement(request):
             user=user,
             heading=heading,
             content=content,
-            amount=amount
         )
         post.save()
 
@@ -565,8 +556,12 @@ def finish(request, team_id, is_post_result):
 
     if (not team) or (user != team.team_leader) or (is_post_result not in ['yes', 'no']):
         return render(request, 'pagenotfound.html', status=404)
-
+    
     post = team.recruit_post
+    
+    if (post.finish):
+        return render(request, 'pagenotfound.html', status=404)
+
     post.finish = True
     post.save()
 

@@ -92,7 +92,6 @@ class TestViews(TestCase):
             heading=f"H{v}",
             content=f"C{v}",
             finish=False,
-            amount=v
          )
          posts.append(post)
 
@@ -304,7 +303,6 @@ class TestViews(TestCase):
       data = {
          "heading": "LOL 5 v 5",
          "content": "Pentakill",
-         "amount": 3,
          "tags": "T1, T20"
       }
       response = c.post("/create", data=data, follow=True)
@@ -320,7 +318,6 @@ class TestViews(TestCase):
       data = {
          "heading": "",
          "content": "",
-         "amount": -1,
          "tags": "T1, T20, T4, T5"
       }
       response = c.post("/create", data=data, follow=True)
@@ -330,7 +327,6 @@ class TestViews(TestCase):
       self.assertFalse(c.session['visited_create'])
       self.assertEqual(response.context["heading"], data["heading"])
       self.assertEqual(response.context["content"], data["content"])
-      self.assertEqual(response.context["amount"], data["amount"])
       self.assertEqual(response.context["tags"], data["tags"])
       self.assertEqual(len(message), 4)
 
@@ -366,7 +362,6 @@ class TestViews(TestCase):
       session["visited_create"] = True
       session["heading"] = "LOL 5 v 5"
       session["content"] = "Pentakill"
-      session["amount"] = 5
       session["tags"] = "T1, T20"
       session.save()
       data = {
@@ -394,7 +389,6 @@ class TestViews(TestCase):
       session["visited_create"] = True
       session["heading"] = "LOL 5 v 5"
       session["content"] = "Pentakill"
-      session["amount"] = 5
       session["tags"] = "T1, T20"
       session.save()
       data = {
