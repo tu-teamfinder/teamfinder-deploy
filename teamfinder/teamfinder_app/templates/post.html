@@ -84,7 +84,7 @@
     </button></div>
 {%endif%}
 
-{%if is_owner%}
+{%if is_owner and is_recruit%}
     <div style="bottom: 10%; right: 10%; position:fixed;">
     <!-- Form to toggle the post status -->
         <form action="{% url 'toggle-status' post_id %}" method="post" style="display: inline;">
@@ -102,6 +102,12 @@
             </label>
         </form>
     </div>
+    <div style="bottom: 15%; right: 10%; position:fixed;">
+        <a href="{% url 'edit_recruitment' post_id %}">
+            <button class= "btn btn-light">
+                Edit Post
+            </button>
+        </a>
+    </div>
 {%endif%}
-
 {%endblock%}

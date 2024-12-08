@@ -38,7 +38,7 @@
   <div id="myTabContent" class="tab-content">
     <div class="tab-pane fade active show" id="home" role="tabpanel">
         <div class=container>
-            <div class="card bg-light mb-3" style="margin:200px; padding:1rem;">
+            <div class="card bg-light mb-3" style="margin:100px; padding:1rem;">
                 <h2>Team Details</h2>
                 <div class="card-body">
                     <!-- Team Information -->
@@ -65,7 +65,9 @@
                         <h3>This Team's Recruitment Post is Finished</h3>
                         <p>No further actions can be taken on this team.</p>
                     </div>
-        
+                    <div style="bottom: 10%; right: 10%; position:fixed;"> 
+                        <a href="{% url 'feedback' team_id%}" class="btn btn-primary">Give Feedback</a>
+                    </div>
                 {%else%}
                     {%if is_owner%}
                     <div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
@@ -73,6 +75,7 @@
                     </button></div>
                     {% endif %}
                 {% endif %}
+
                 </div>
             </div>
         </div>
@@ -92,7 +95,7 @@
                         </div>
                         <div class="notification-list_feature-img">
                             <a href="{% url 'accept' request.request_id %}"><button type="submit" class="btn btn-success">Accept</button></a>
-                            <button type="button" class="btn btn-danger">Cancel</button>
+                            <a href="{% url 'decline' request.request_id %}"><button type="button" class="btn btn-danger">Cancel</button></a>
                         </div>
                     </div>
                     {%empty%}

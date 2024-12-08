@@ -7,22 +7,20 @@
     <div class="teams-container">
         <h1>Active</h1>
         <div class="team-box-container">
-            {%for team in active%}
+                {%for team in active%}
                 <a class ="btn btn-outline-primary" href="{% url 'team' team.team_id%}"> {{team.recruit_post.heading}} </a>
-
-            {%endfor%}
-
+                {%endfor%}
         </div>
     </div>
 
     <div class="teams-container">
         <h1>Finished</h1>
-        {%for team in finished%}
         <div class="team-box-container">
+            {%for team in finished%}
             <a class="btn btn-outline-success" href="{% url 'team' team.team_id%}"> {{team.recruit_post.heading}} </a>
+            {%endfor%}
         </div>
-        {%endfor%}
     </div>
-    
+
 
 {% endblock %}
