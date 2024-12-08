@@ -571,8 +571,7 @@ def finish(request, team_id, is_post_result):
     post.save()
 
     recruit = RecruitPost.objects.filter(post=post).first()
-    recruit.status = False
-    recruit.save()
+    recruit.delete()
 
     if is_post_result == 'yes':
         return redirect(f'/post_result/{post.post_id}')
