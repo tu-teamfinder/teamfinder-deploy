@@ -4,6 +4,7 @@
 {% block head%}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css">
 <script src="https://cdn.jsdelivr.net/npm/@yaireo/tagify"></script>
+<link rel="stylesheet" href="{% static "styles/tagify.css" %}">
 {%endblock%}
 {% block nav %}
 <form id="search-bar" action="{% url 'search_result' %}" method="POST">
@@ -25,7 +26,7 @@
                     <!-- tag -->
                     <div>
                         {% for tag in post.tag.all %}
-                        <button id="tag" class="btn btn-secondary btn-sm" data-tag="{{ tag.name }}" data-form-id="form-{{ post.post_id }}">{{ tag.name }}</button>
+                        <button id="tag" class="search-tag-btn btn btn-secondary btn-sm" data-tag="{{ tag.name }}" data-form-id="form-{{ post.post_id }}">{{ tag.name }}</button>
                         {% endfor %}
                     </div>
 
@@ -64,20 +65,20 @@
 {% block javascript %}
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('.search-tag-btn');
+        const buttons = document.querySelectorAll('.search-tag-btn');
 
-    buttons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            const tag = event.target.getAttribute('data-tag'); // Get the tag name
-            const formId = event.target.getAttribute('data-form-id'); // Get the related form ID
-            const form = document.getElementById(formId); // Get the form element dynamically
-            const input = form.querySelector('input[name="search"]'); // Get the input inside the form
+        buttons.forEach(button => {
+            button.addEventListener('click', (event) => {
+                const tag = event.target.getAttribute('data-tag'); // Get the tag name
+                const formId = event.target.getAttribute('data-form-id'); // Get the related form ID
+                const form = document.getElementById(formId); // Get the form element dynamically
+                const input = form.querySelector('input[name="search"]'); // Get the input inside the form
 
-            input.value = tag; // Set the tag value in the hidden input
-            form.submit(); // Submit the form
+                input.value = tag; // Set the tag value in the hidden input
+                form.submit(); // Submit the form
+            });
         });
     });
-});
     var search = document.querySelector('input[name=search]'),
         whitelist = {{tag_list|safe}};
 

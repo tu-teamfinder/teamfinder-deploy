@@ -114,7 +114,6 @@ class Post(models.Model):
     heading = models.CharField(max_length=255)
     content = models.TextField()
     finish = models.BooleanField(default=False)
-    amount = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class PostComment(models.Model):

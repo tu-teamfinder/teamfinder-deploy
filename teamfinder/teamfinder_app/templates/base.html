@@ -23,7 +23,7 @@
 <body style="background-color: #f9f8ff;">
     <nav class="navbar navbar-expand-lg" style="background-color: #c3002f;" data-bs-theme="dark">
         <div class="container-fluid">
-          <i class='bx bxs-group'></i>
+          <img src="{% static 'images/favicon.ico' %}" alt="Logo" width="40" height="40" class="d-inline-block align-text-center">
           <a class="navbar-brand" href="#">Team Finder</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -31,15 +31,15 @@
           <div class="collapse navbar-collapse" id="navbarColor01">
             <ul class="navbar-nav me-auto">
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'recruitment' %}">Recruitment
+                <a class="nav-link" href="{% url 'recruitment' %}" name="/recruitment">Recruitment
                   <span class="visually-hidden">(current)</span>
                 </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'result' %}">Result</a>
+                <a class="nav-link" href="{% url 'result' %}" name="/result">Result</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="{% url 'team-chat' 'default' %}">Chat</a>
+                <a class="nav-link" href="{% url 'team-chat' 'default' %}" name="/chat">Chat</a>
               </li>
             </ul>
 
@@ -63,7 +63,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
       document.querySelectorAll(".nav-link").forEach((link) => {
-        if (link.href === window.location.href) {
+        if (window.location.href.includes(link.name)) {
             link.classList.add("active");
             link.setAttribute("aria-current", "page");
         }

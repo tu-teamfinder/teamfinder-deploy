@@ -295,7 +295,6 @@ def create_post(request):
     if request.method == 'POST':
         heading = request.POST.get('heading')
         content = request.POST.get('content')
-        amount = int(request.POST.get('amount'))
         tags = [tag.strip() for tag in request.POST.get('tags').split(',') if tag.strip()]
         invalid = False
 
@@ -305,21 +304,16 @@ def create_post(request):
 
         if not content.strip():
             invalid = True
-            messages.error(request, 'Please enter content')
+            messages.error(request, 'Please enter content') 
 
-        if amount > 50 or amount < 1:
+        if len(tags) > 3 or len(tags) < 1:
             invalid = True
-            messages.error(request, 'Can recruit 1 to 50')    
-
-        if len(tags) > 3:
-            invalid = True
-            messages.error(request, 'Only 3 tags can use')
+            messages.error(request, 'Must be 1-3 tag(s)')
 
         if invalid:
             context = {
                 "heading": heading,
                 "content": content,
-                "amount": amount,
                 "tags": request.POST.get('tags'),
                 "tag_list": tag_list,
             }
@@ -328,7 +322,6 @@ def create_post(request):
 
         request.session['heading'] = heading
         request.session['content'] = content
-        request.session['amount'] = amount
         request.session['tags'] = tags
         request.session['visited_create'] = True
 
@@ -343,7 +336,6 @@ def web_requirement(request):
     user = request.user
     heading = request.session.get('heading')
     content = request.session.get('content')
-    amount = request.session.get('amount')
     tags = request.session.get('tags')
 
     faculty_list = [faculty.name for faculty in Faculty.objects.all()]
@@ -391,7 +383,6 @@ def web_requirement(request):
             user=user,
             heading=heading,
             content=content,
-            amount=amount
         )
         post.save()
 
@@ -497,13 +488,16 @@ def team(request, team_id):
 
     request_list = list(Request.objects.filter(post=team.recruit_post)) if is_owner else []
     
+    chat_group = ChatGroup.objects.get(team=team)
+
     context = {
         "team": team,
         "team_id": team_id,
         "members": members,
         "is_owner": is_owner,
         "is_finish": is_finish,
-        "request_list": request_list
+        "request_list": request_list,
+        "group_id": chat_group.group_id
     }
 
     return render(request, 'team.html', context)
@@ -565,14 +559,17 @@ def finish(request, team_id, is_post_result):
 
     if (not team) or (user != team.team_leader) or (is_post_result not in ['yes', 'no']):
         return render(request, 'pagenotfound.html', status=404)
-
+    
     post = team.recruit_post
+    
+    if (post.finish):
+        return render(request, 'pagenotfound.html', status=404)
+
     post.finish = True
     post.save()
 
     recruit = RecruitPost.objects.filter(post=post).first()
-    recruit.status = False
-    recruit.save()
+    recruit.delete()
 
     if is_post_result == 'yes':
         return redirect(f'/post_result/{post.post_id}')
@@ -764,9 +761,9 @@ def edit_recruitment(request, post_id):
             invalid = True
             messages.error(request, 'Please enter content')
 
-        if len(tags) > 3:
+        if len(tags) > 3 or len(tags) < 1:
             invalid = True
-            messages.error(request, 'Only 3 tags can use')
+            messages.error(request, 'Must be 1-3 tag(s)')
 
         if invalid:
             context = {
@@ -803,7 +800,7 @@ def edit_recruitment(request, post_id):
 @login_required(login_url="/login")
 def edit_result(request, post_id):
     user = request.user
-    result = RecruitPost.objects.filter(post_id=post_id).first()
+    result = ResultPost.objects.filter(post_id=post_id).first()
     tag_list = list(Tag.objects.values_list('name', flat=True))
     if user != result.post.user or not result:
         return render(request, 'pagenotfound.html', status=404)
@@ -822,9 +819,9 @@ def edit_result(request, post_id):
             invalid = True
             messages.error(request, 'Please enter content')
 
-        if len(tags) > 3:
+        if len(tags) > 3 or len(tags) < 1:
             invalid = True
-            messages.error(request, 'Only 3 tags can use')
+            messages.error(request, 'Must be 1-3 tag(s)')
 
         if invalid:
             context = {

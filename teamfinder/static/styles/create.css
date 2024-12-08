@@ -56,31 +56,28 @@ input, textarea {
 
 .tagify{    
     width: 100%;
-    max-width: 700px;
+    max-width: 1000px;
     border-radius: 5px;
     --placeholder-color: rgba(0, 0, 0, 0.5);
     background-color: white;
     --placeholder-color-focus: rgba(255, 255, 255, 0.5);
 }
 
-
 input::placeholder{
     color: black;
     opacity: 0.5; 
 }
 
-
-
 .tags-look .tagify__dropdown__item{
-display: inline-block;
-border-radius: 3px;
-padding: .3em .5em;
-border: 1px solid #CCC;
-background: #F3F3F3;
-margin: .2em;
-font-size: .85em;
-color: black;
-transition: 0s;
+    display: inline-block;
+    border-radius: 3px;
+    padding: .3em .5em;
+    border: 1px solid #CCC;
+    background: #F3F3F3;
+    margin: .2em;
+    font-size: .85em;
+    color: black;
+    transition: 0s;
 }
 
 .tags-look .tagify__dropdown__item--active{
@@ -88,11 +85,25 @@ color: black;
 }
 
 .tags-look .tagify__dropdown__item:hover{
-background: lightyellow;
-border-color: gold;
+    background: lightyellow;
+    border-color: gold;
 }
-
 
 .form-group-year{
     display: inline;
+}
+
+.tagify__tag {
+    --tag-border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Optional: horizontally center the text */
+    line-height: normal; /* Prevents unexpected vertical spacing */
+    height: 100%; /* Ensures tag height consistency */
+}
+
+.tagify__tag-text {
+    margin: 0; /* Remove any default margin */
+    text-align: center; /* Optional for multi-line text alignment */
+    display: inline-block; /* Ensures proper behavior within flexbox */
 }

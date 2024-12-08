@@ -35,25 +35,28 @@
             <div class="form-group">
                 <label for="tag">Tags</label>
                 <input name='tags' class='tag_input' placeholder='write some tags' value=''>
-                <script>
-                    var input = document.querySelector('input[name="tags"]');
-                    var whitelist = {{tag_list|safe}};
-
-                    var tagify = new Tagify(input, {
-                        originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
-                        whitelist:whitelist,
-                        maxTags: 10,
-                        dropdown: {
-                            maxItems: 20,          
-                            classname: "tags-look", 
-                            enabled: 0,            
-                            closeOnSelect: false   
-                        }
-                    })
-                </script>
             </div>
             <a class="btn btn-danger" type="button" href="{% url 'teams'%}" style="margin-right:10px;">Cancel</a>
             <button type="submit" class="btn btn-primary">Post</button>
         </form>
     </div>
+{% endblock %}
+
+{% block javascript %}
+<script>
+    var input = document.querySelector('input[name="tags"]');
+    var whitelist = {{tag_list|safe}};
+
+    var tagify = new Tagify(input, {
+        originalInputValueFormat: valuesArr => valuesArr.map(item => item.value).join(','),
+        whitelist:whitelist,
+        maxTags: 10,
+        dropdown: {
+            maxItems: 20,          
+            classname: "tags-look", 
+            enabled: 0,            
+            closeOnSelect: false   
+        }
+    })
+</script>
 {% endblock %}
