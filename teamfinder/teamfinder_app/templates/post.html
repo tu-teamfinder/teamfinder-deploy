@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
-{%block title%}Post{%endblock%}
-{%block head%}
-{%endblock%}
+{% block title %}Post{% endblock %}
+{% block head %}
+{% endblock %}
 <style>
     .btn{
         bottom: 20%;
@@ -25,7 +25,7 @@
         <div class="row">
             <div class="col-sm-5 col-md-6 col-12 pb-4">
                 <h1>Comments</h1>
-                {% for comment in comments%}
+                {% for comment in comments %}
                 <div class="card border-dark mt-4 text-justify float-left">
                     <div class="card-body">
                     <h4 style="display: inline; text-transform: capitalize;">{{comment.user.name}}</h4>
@@ -34,10 +34,10 @@
                     <p class="mt-2">{{comment.comment}}</p>
                     </div>
                 </div>
-                {%endfor%}
+                {% endfor %}
             </div>
             <div class="col-lg-4 col-md-5 col-sm-4 offset-md-1 offset-sm-1 col-12 mt-4">
-                <form method="POST" action="{% url 'comment' post_id%}">
+                <form method="POST" action="{% url 'comment' post_id %}">
                     {% csrf_token %}
                     <div class="form-group mb-5">
                         <h4>Leave a comment</h4>
@@ -66,7 +66,7 @@
         <div class="modal-body">
 
             <form method='POST' action="{% url 'request' post_id%}">
-            {%csrf_token%}
+            {% csrf_token %}
             <textarea class = "form-control" id="message" name="message" rows="5" >{{ message|default:'' }}</textarea>
         </div>
         <div class="modal-footer">
@@ -78,13 +78,13 @@
     </div>
 </div>
 
-{%if not is_owner and requestable%}
+{%if not is_owner and requestable %}
     <div style="bottom: 10%; right: 10%; position:fixed;"> <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Modal">
     Request
     </button></div>
 {%endif%}
 
-{%if is_owner%}
+{%if is_owner and is_recruit %}
     <div style="bottom: 10%; right: 10%; position:fixed;">
     <!-- Form to toggle the post status -->
         <form action="{% url 'toggle-status' post_id %}" method="post" style="display: inline;">
