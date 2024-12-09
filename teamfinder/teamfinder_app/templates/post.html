@@ -12,7 +12,7 @@
 </style>
 {% block content %}
 <div class="container">
-<div class="card text-white bg-dark m-25 mt-5 mb-5" style="">
+<div class="card border-dark m-25 mt-5 mb-5" style="">
     <div class="card-header">{{heading}}</div>
     <div class="card-body">
       <h4 class="card-title">{{heading}}</h4>
@@ -86,22 +86,17 @@
 
 {%if is_owner and is_recruit %}
     <div style="bottom: 10%; right: 10%; position:fixed;">
-    <!-- Form to toggle the post status -->
-        <form action="{% url 'toggle-status' post_id %}" method="post" style="display: inline;">
-            {% csrf_token %}
-            <input 
-            type="checkbox" 
-            class="btn-check" 
-            id="btn-check-outlined" 
-            name="status" 
-            autocomplete="off" 
-            onchange="this.form.submit();" 
-            {% if status %}checked{% endif %}>
-            <label class="btn btn-outline-primary" for="btn-check-outlined">
-            Activate
-            </label>
-        </form>
+    <form action="{% url 'toggle-status' post_id %}" method="post">
+        {% csrf_token %}
+        <button 
+            type="submit" 
+            class="{% if status %}btn btn-primary{% else %}btn btn-outline-primary{% endif %}">
+            {% if status %}Activate{% else %}Activate{% endif %}
+        </button>
+    </form>
     </div>
+
+
     <div style="bottom: 15%; right: 10%; position:fixed;">
         <a href="{% url 'edit_recruitment' post_id %}">
             <button class= "btn btn-light">
@@ -110,4 +105,15 @@
         </a>
     </div>
 {%endif%}
+
+{%if not is_recruit%}
+    <div style="bottom: 10%; right: 10%; position:fixed;">
+        <a href="{% url 'edit_result' post_id %}">
+            <button class= "btn btn-light">
+                Edit Post
+            </button>
+        </a>
+    </div>
+{%endif%}
+
 {%endblock%}
