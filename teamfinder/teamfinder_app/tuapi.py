@@ -31,42 +31,43 @@ def auth(user: str, password: str) -> dict:
 
     return {"status": status, "data": data}
     
+# All comment below is unuse function write by Tanapat
 
-def get_user_info(user: str) -> dict:
-    """
-    Get user information
-    return status and response data
-    """
+# def get_user_info(user: str) -> dict:
+#     """
+#     Get user information
+#     return status and response data
+#     """
         
-    url = v2 + f"/profile/std/info/?id={user}"
-    response = requests.get(url, headers=headers)
-    status = response.status_code
-    data = response.json()
+#     url = v2 + f"/profile/std/info/?id={user}"
+#     response = requests.get(url, headers=headers)
+#     status = response.status_code
+#     data = response.json()
     
-    return {"status": status, "data": data}
+#     return {"status": status, "data": data}
 
 
-def get_faculty_all() -> dict:
-    """
-    Get all faculty name
-    """
+# def get_faculty_all() -> dict:
+#     """
+#     Get all faculty name
+#     """
 
-    url = v2 + "/std/fac/all"
-    response = requests.get(url, headers=headers)
-    status = response.status_code
-    data = response.json()
+#     url = v2 + "/std/fac/all"
+#     response = requests.get(url, headers=headers)
+#     status = response.status_code
+#     data = response.json()
     
-    return {"status": status, "data": data}
+#     return {"status": status, "data": data}
 
 
-def get_department_all() -> dict:
-    """
-    Get all department name
-    """
+# def get_department_all() -> dict:
+#     """
+#     Get all department name
+#     """
 
-    url = v2 + "/std/dep/all"
-    response = requests.get(url, headers=headers)
-    status = response.status_code
-    data = response.json()
+#     url = v2 + "/std/dep/all"
+#     response = requests.get(url, headers=headers)
+#     status = response.status_code
+#     data = response.json()
     
-    return {"status": status, "data": data}
+#     return {"status": status, "data": data}
