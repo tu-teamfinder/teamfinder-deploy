@@ -85,29 +85,6 @@ class Major(TagBase):
 class MajorTag(GenericTaggedItemBase):
     tag = models.ForeignKey(Major, on_delete=models.CASCADE, related_name="major_tag")
 
-class Group(models.Model):
-    group_id = models.AutoField(primary_key=True)
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_groups")
-    group_name = models.CharField(max_length=255)
-
-class GroupMember(models.Model):
-    group = models.ForeignKey(Group, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-
-class Message(models.Model):
-    message_id = models.AutoField(primary_key=True)
-    message = models.TextField()
-    timestamp = models.DateTimeField(auto_now_add=True)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_messages")
-
-class DirectMessage(models.Model):
-    message = models.OneToOneField(Message, on_delete=models.CASCADE, primary_key=True)
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_direct_messages")
-
-class GroupMessage(models.Model):
-    message = models.OneToOneField(Message, on_delete=models.CASCADE, primary_key=True)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="group_messages")
-
 class Post(models.Model):
     post_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")

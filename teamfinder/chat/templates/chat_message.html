@@ -15,12 +15,12 @@
 {% else %}
 <li>
     <div class="tw-flex tw-justify-start">
-        <a href="/profile_page/{{message.author.username}}" target="_blank">
+        <a href="/profile/{{message.author.username}}" target="_blank">
             <span class="tw-text-gray-500">{{ message.author.username }}</span>
         </a>
     </div>
     <div class="tw-flex tw-justify-start">
-        <a href="/profile_page/{{message.author.username}}" target="_blank">
+        <a href="/profile/{{message.author.username}}" target="_blank">
             {% if message.author.profile.profile_image %}
             <img src="{{ message.author.profile.profile_image.url }}" alt="{{ message.author.username }}'s Profile Picture" class="profile-pic">
             {% else %}

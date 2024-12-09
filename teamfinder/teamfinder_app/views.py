@@ -672,6 +672,7 @@ def feedback(request, team_id):
 
 
 #Search-recruit no search by requirement
+@login_required(login_url="/login")
 def search_recruit(request):
     if request.method == "POST":
         search = request.POST.get('search')
@@ -698,6 +699,7 @@ def search_recruit(request):
 
 
 #Search-result
+@login_required(login_url="/login")
 def search_result(request):
     if request.method == "POST":
         search = request.POST.get('search')
@@ -722,29 +724,27 @@ def search_result(request):
     return redirect('/result')
 
 
-#Message
-@login_required(login_url="/login")
-def message_history(request, receiver):
-    return render()
-
-
-#Help
-def help(request):
-    return render(request, 'help.html')
-
+#Profile
 @login_required(login_url="/login")
 def profile_page(request, username):
-    user = get_object_or_404(User, username=username)
-    context = {"username": user.username,
-               "userdata": user,}
+    user = User.objects.filter(username=username).first()
+
+    if not user:
+        return render(request, 'pagenotfound.html', status=404)
+    
     return render(request, 'profile_page.html', {'user': user})
 
+#Edit recruit
 @login_required(login_url="/login")
 def edit_recruitment(request, post_id):
     user = request.user
     recruit = RecruitPost.objects.filter(post_id=post_id).first()
     tag_list = list(Tag.objects.values_list('name', flat=True))
-    if user != recruit.post.user or not recruit:
+    
+    if not recruit:
+        return render(request, 'pagenotfound.html', status=404)
+    
+    if user != recruit.post.user:
         return render(request, 'pagenotfound.html', status=404)
     
     if request.method == 'POST':
@@ -797,12 +797,17 @@ def edit_recruitment(request, post_id):
 
     return render(request, 'edit_recruitment.html', context)
 
+#Edit result
 @login_required(login_url="/login")
 def edit_result(request, post_id):
     user = request.user
     result = ResultPost.objects.filter(post_id=post_id).first()
     tag_list = list(Tag.objects.values_list('name', flat=True))
-    if user != result.post.user or not result:
+
+    if not result:
+        return render(request, 'pagenotfound.html', status=404)
+    
+    if user != result.post.user:
         return render(request, 'pagenotfound.html', status=404)
     
     if request.method == 'POST':

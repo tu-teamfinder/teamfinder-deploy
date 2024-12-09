@@ -1,11 +1,13 @@
 from django.test import TestCase, Client
 from django.contrib.messages import get_messages
 from unittest.mock import patch, MagicMock
+from django.core.files.uploadedfile import SimpleUploadedFile
 from teamfinder_app.tuapi import auth, get_user_info
 from django.urls import reverse
 from taggit.models import Tag
 from django.contrib.auth import authenticate, login, logout, get_user, get_user_model
 from teamfinder_app.models import *
+from chat.models import *
 
 
 # class TestAPI(TestCase):
@@ -43,7 +45,7 @@ class TestViews(TestCase):
    def setUp(self):
       User = get_user_model()
 
-      u1 = User.objects.create_user(
+      self.u1 = User.objects.create_user(
          username="6510615888",
          password="password123",
          email_address="user1@example.com",
@@ -52,9 +54,9 @@ class TestViews(TestCase):
          faculty="ENGR",
          year=3,
       )
-      UserProfile.objects.create(user=u1)
+      UserProfile.objects.create(user=self.u1)
 
-      u2 = User.objects.create_user(
+      self.u2 = User.objects.create_user(
          username="6601349999",
          password="password123",
          email_address="user2@example.com",
@@ -63,9 +65,9 @@ class TestViews(TestCase):
          faculty="SCI",
          year=2,
       )
-      UserProfile.objects.create(user=u2)
+      UserProfile.objects.create(user=self.u2)
 
-      users = [u1, u2]
+      users = [self.u1, self.u2]
       posts = []
       recruit_posts = []
       result_posts = []
@@ -142,7 +144,7 @@ class TestViews(TestCase):
             reaction="",
          )
 
-      #Create Team
+      #Create Team and Chat Group
       for v in range(20):
          team = Team.objects.create(
             team_leader=posts[v].user,
@@ -152,8 +154,13 @@ class TestViews(TestCase):
             team=team,
             member=posts[v].user
          )
+         chat_group = ChatGroup.objects.create(
+            team=team,
+            admin=posts[v].user
+         )
+         chat_group.members.add(posts[v].user)
 
-   def test_myaccount_access(self):
+   def test_myaccount_case1(self):
       """test myacoount access"""
 
       c = Client()
@@ -161,11 +168,56 @@ class TestViews(TestCase):
       response = c.get('/myaccount')
       self.assertEqual(response.request["PATH_INFO"], "/myaccount")
       self.assertEqual(response.status_code, 200) 
+      self.assertEqual(response.context["username"], "6510615888")
 
-      c.logout()
-      response = c.get('/myaccount', follow=True)
-      self.assertEqual(response.request["PATH_INFO"], "/login")
+   def test_myaccount_case2(self):
+      """test myacoount access : POST Successful"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      image_file = SimpleUploadedFile(
+            name='test_image.png',
+            content=b'file_content',
+            content_type='image/jpeg'
+        )
+      data = {
+         "form": image_file
+      }
+      response = c.post('/myaccount', data=data, follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/myaccount")
       self.assertEqual(response.status_code, 200) 
+      self.assertEqual(response.context["username"], "6510615888")
+
+   def test_my_stats_case1(self):
+      """test my stats : No Feedback"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      response = c.get('/mystats', follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/mystats")
+      self.assertEqual(response.status_code, 200) 
+      self.assertFalse(response.context["feedback"])
+
+   def test_my_stats_case2(self):
+      """test my stats : Has Feedback"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      Feedback.objects.create(
+         team=Team.objects.get(team_id=1),
+         reviewer=self.u2,
+         receiver=self.u1,
+         communication_pt=2,
+         collaboration_pt=2,
+         reliability_pt=2,
+         technical_pt=2,
+         empathy_pt=2,
+         comment="NO"
+      )
+      response = c.get('/mystats', follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/mystats")
+      self.assertEqual(response.status_code, 200) 
+      self.assertTrue(response.context["feedback"])
 
    def test_homepage(self):
       """test homepage access"""
@@ -183,6 +235,15 @@ class TestViews(TestCase):
       self.assertEqual(response.request["PATH_INFO"], "/about")
       self.assertEqual(response.status_code, 200)
 
+   def test_logout(self):
+      """test logout"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      response = c.get("/logout", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/login")
+      self.assertEqual(response.status_code, 200)
+
    def test_recruitment(self):
       """test recruitment send all recruit post that status = True"""
 
@@ -193,15 +254,15 @@ class TestViews(TestCase):
       self.assertEqual(response.status_code, 200)
       self.assertEqual(len(response.context["posts"]), 7)
    
-   # def test_result(self): #Need result.html
-   #    """test result send all result post"""
+   def test_result(self):
+      """test result send all result post"""
 
-   #    c = Client()
-   #    c.login(username="6510615888", password="password123")
-   #    response = c.get("/result")
-   #    self.assertEqual(response.request["PATH_INFO"], "/result")
-   #    self.assertEqual(response.status_code, 200)
-   #    self.assertEqual(len(response.context["posts"]), 5)
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      response = c.get("/result")
+      self.assertEqual(response.request["PATH_INFO"], "/result")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(len(response.context["posts"]), 5)
    
    def test_web_post_case1(self):
       """test web_post
@@ -328,7 +389,7 @@ class TestViews(TestCase):
       self.assertEqual(response.context["heading"], data["heading"])
       self.assertEqual(response.context["content"], data["content"])
       self.assertEqual(response.context["tags"], data["tags"])
-      self.assertEqual(len(message), 4)
+      self.assertEqual(len(message), 3)
 
    def test_web_requirement_case1(self):
       """test web requirement : GET"""
@@ -478,38 +539,58 @@ class TestViews(TestCase):
       self.assertEqual(response.status_code, 404)
 
    def test_finish_case1(self): 
-      """test finish : Success, not post result"""
+      """test finish : Successful, not post result"""
 
       c = Client()
       c.login(username="6510615888", password="password123")
       response = c.get("/finish/1/no", follow=True)
       post = Post.objects.get(post_id=1)
-      recruit = RecruitPost.objects.get(post=post)
+      recruit = RecruitPost.objects.filter(post=post).first()
       self.assertEqual(response.request["PATH_INFO"], "/team/1")
       self.assertEqual(response.status_code, 200)
       self.assertTrue(post.finish)
-      self.assertFalse(recruit.status)
+      self.assertFalse(recruit)
 
    def test_finish_case2(self):
-      """test finish : Success, w/ post result"""
+      """test finish : Successful, w/ post result"""
 
       c = Client()
       c.login(username="6510615888", password="password123")
       response = c.get("/finish/1/yes", follow=True)
       post = Post.objects.get(post_id=1)
-      recruit = RecruitPost.objects.get(post=post)
+      recruit = RecruitPost.objects.filter(post=post).first()
       self.assertEqual(response.request["PATH_INFO"], "/post_result/1")
       self.assertEqual(response.status_code, 200)
       self.assertTrue(post.finish)
-      self.assertFalse(recruit.status)
+      self.assertFalse(recruit)
 
    def test_finish_case3(self): 
       """test finish : Fail, not met conditions"""
 
       c = Client()
       c.login(username="6510615888", password="password123")
-      response = c.get("/finish/100/yes", follow=True)
-      self.assertEqual(response.request["PATH_INFO"], "/finish/100/yes")
+      response_1 = c.get("/finish/100/yes", follow=True)
+      response_2 = c.get("/finish/2/yes", follow=True)
+      response_3 = c.get("/finish/1/something", follow=True)
+      self.assertEqual(response_1.request["PATH_INFO"], "/finish/100/yes")
+      self.assertEqual(response_1.status_code, 404)
+      self.assertEqual(response_2.request["PATH_INFO"], "/finish/2/yes")
+      self.assertFalse(Post.objects.get(post_id=2).finish)
+      self.assertEqual(response_2.status_code, 404)
+      self.assertEqual(response_3.request["PATH_INFO"], "/finish/1/something")
+      self.assertFalse(Post.objects.get(post_id=1).finish)
+      self.assertEqual(response_3.status_code, 404)
+
+   def test_finish_case4(self): 
+      """test finish : Fail, already finish"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      post = Post.objects.get(post_id=2)
+      post.finish = True
+      post.save()
+      response = c.get("/finish/2/yes", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/finish/2/yes")
       self.assertEqual(response.status_code, 404)
 
    def test_post_result_case1(self): 
@@ -580,23 +661,23 @@ class TestViews(TestCase):
       self.assertEqual(response.request["PATH_INFO"], "/post_result/100")
       self.assertEqual(response.status_code, 404)
 
-   # def test_feedback_case1(self): #Need feedback.html
-   #    """test feedback : GET"""
+   def test_feedback_case1(self):
+      """test feedback : GET"""
 
-   #    c = Client()
-   #    c.login(username="6510615888", password="password123")
-   #    another_user = User.objects.get(username="6601349999")
-   #    TeamMember.objects.create(
-   #       team=Team.objects.get(team_id=1),
-   #       member=another_user
-   #    )
-   #    post = Post.objects.get(post_id=1)
-   #    post.finish = True
-   #    post.save()
-   #    response = c.get("/feedback/1", follow=True)
-   #    self.assertEqual(response.request["PATH_INFO"], "/feedback/1")
-   #    self.assertEqual(response.status_code, 200)
-   #    self.assertEqual(len(response.context["feedback_forms"]), 1)
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      another_user = User.objects.get(username="6601349999")
+      TeamMember.objects.create(
+         team=Team.objects.get(team_id=1),
+         member=another_user
+      )
+      post = Post.objects.get(post_id=1)
+      post.finish = True
+      post.save()
+      response = c.get("/feedback/1", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/feedback/1")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(len(response.context["feedback_forms"]), 1)
 
    def test_feedback_case2(self):
       """test feedback : POST successful"""
@@ -620,7 +701,7 @@ class TestViews(TestCase):
       post.finish = True
       post.save()
       response = c.post("/feedback/1", data=data, follow=True)
-      self.assertEqual(response.request["PATH_INFO"], "/myaccount")
+      self.assertEqual(response.request["PATH_INFO"], "/teams")
       self.assertEqual(response.status_code, 200)
       self.assertEqual(Feedback.objects.all().count(), 1)
 
@@ -646,7 +727,7 @@ class TestViews(TestCase):
       post.finish = True
       post.save()
       response = c.post("/feedback/1", data=data, follow=True)
-      self.assertEqual(response.request["PATH_INFO"], "/myaccount")
+      self.assertEqual(response.request["PATH_INFO"], "/teams")
       self.assertEqual(response.status_code, 200)
       self.assertEqual(Feedback.objects.all().count(), 0)
 
@@ -658,3 +739,322 @@ class TestViews(TestCase):
       response = c.get("/feedback/100", follow=True)
       self.assertEqual(response.request["PATH_INFO"], "/feedback/100")
       self.assertEqual(response.status_code, 404)
+
+   def test_status_case1(self):
+      """test status : Successful"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      status_before = RecruitPost.objects.get(post_id=1).status
+      response = c.get("/status/1", follow=True)
+      status_after = RecruitPost.objects.get(post_id=1).status
+      self.assertEqual(response.request["PATH_INFO"], "/post/1")
+      self.assertEqual(response.status_code, 200)
+      self.assertNotEqual(status_after, status_before)
+
+   def test_status_case2(self):
+      """test status : Fail, post doesn't exist"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      response = c.get("/status/100", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/status/100")
+      self.assertEqual(response.status_code, 404)
+   
+   def test_status_case3(self):
+      """test status : Fail, not owner"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      response = c.get("/status/2", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/status/2")
+      self.assertEqual(response.status_code, 404)
+
+   def test_accept_case1(self):
+      """test accept : Successful"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      Request.objects.create(
+         post=Post.objects.get(post_id=1),
+         user=self.u2,
+         message="ขอเข้าร่วม",
+         requirement=Requirement.objects.get(require_id=1)
+      )
+      response = c.get("/accept/1", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/team/1")
+      self.assertEqual(response.status_code, 200)
+      self.assertFalse(Request.objects.all().count())
+      self.assertEqual(TeamMember.objects.all().count(), 21)
+
+   def test_accept_case2(self):
+      """test accept : Fail, request doesn't exist"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      response = c.get("/accept/1", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/accept/1")
+      self.assertEqual(response.status_code, 404)
+
+   def test_accept_case3(self):
+      """test accept : Fail, not post owner"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      Request.objects.create(
+         post=Post.objects.get(post_id=1),
+         user=self.u2,
+         message="ขอเข้าร่วม",
+         requirement=Requirement.objects.get(require_id=1)
+      )
+      response = c.get("/accept/1", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/accept/1")
+      self.assertEqual(response.status_code, 404)
+      self.assertEqual(Request.objects.all().count(), 1)
+
+   def test_decline_case1(self):
+      """test decline : Successful"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      Request.objects.create(
+         post=Post.objects.get(post_id=1),
+         user=self.u2,
+         message="ขอเข้าร่วม",
+         requirement=Requirement.objects.get(require_id=1)
+      )
+      response = c.get("/decline/1", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/team/1")
+      self.assertEqual(response.status_code, 200)
+      self.assertFalse(Request.objects.all().count())
+      self.assertEqual(TeamMember.objects.all().count(), 20)
+
+   def test_decline_case2(self):
+      """test decline : Fail, request doesn't exist"""
+
+      c = Client()
+      c.login(username="6510615888", password="password123")
+      response = c.get("/decline/1", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/decline/1")
+      self.assertEqual(response.status_code, 404)
+
+   def test_decline_case3(self):
+      """test decline : Fail, not post owner"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      Request.objects.create(
+         post=Post.objects.get(post_id=1),
+         user=self.u2,
+         message="ขอเข้าร่วม",
+         requirement=Requirement.objects.get(require_id=1)
+      )
+      response = c.get("/decline/1", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/decline/1")
+      self.assertEqual(response.status_code, 404)
+      self.assertEqual(Request.objects.all().count(), 1)
+
+   def test_search_recruit_case1(self):
+      """test serach recruit : Successful"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      data = {
+         "search": "T1, T2, T3"
+      }
+      response = c.post("/recruitment/search", data=data, follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/recruitment/search")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(response.context["posts"].count(), 4)
+
+   def test_search_recruit_case2(self):
+      """test serach recruit : Fail, empty query"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      data = {
+         "search": ""
+      }
+      response = c.post("/recruitment/search", data=data, follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/recruitment")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(len(response.context["posts"]), 7)
+
+   def test_search_recruit_case3(self):
+      """test serach recruit : GET method"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      response = c.get("/recruitment/search", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/recruitment")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(len(response.context["posts"]), 7)
+
+   def test_search_result_case1(self):
+      """test serach result : Successful"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      data = {
+         "search": "T1, T2, T3"
+      }
+      response = c.post("/result/search", data=data, follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/result/search")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(response.context["posts"].count(), 2)
+
+   def test_search_result_case2(self):
+      """test serach result : Fail, empty query"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      data = {
+         "search": ""
+      }
+      response = c.post("/result/search", data=data, follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/result")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(len(response.context["posts"]), 5)
+
+   def test_search_result_case3(self):
+      """test serach result : GET method"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      response = c.get("/result/search", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/result")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(len(response.context["posts"]), 5)
+
+   def test_profile_page_case1(self):
+      """test profile page : Successful"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      response = c.get("/profile/6601349999", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/profile/6601349999")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(response.context["user"], User.objects.get(username="6601349999"))
+
+   def test_profile_page_case2(self):
+      """test profile page : Fail, user doesn't exist"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      response = c.get("/profile/6601349991", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/profile/6601349991")
+      self.assertEqual(response.status_code, 404)
+
+   def test_edit_recruitment_case1(self):
+      """test edit recruitment : GET"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      heading = Post.objects.get(post_id=2).heading
+      response = c.get("/recruitment/edit/2", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/recruitment/edit/2")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(heading, response.context["heading"])
+
+   def test_edit_recruitment_case2(self):
+      """test edit recruitment : POST Successful"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      data = {
+         "heading": "LOL",
+         "content": "ROV",
+         "tags": "T1, T2, T3"
+      }
+      response = c.post("/recruitment/edit/2", data=data, follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/post/2")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual("LOL", Post.objects.get(post_id=2).heading)
+      self.assertEqual(3, RecruitPost.objects.get(post_id=2).tag.all().count())
+
+   def test_edit_recruitment_case3(self):
+      """test edit recruitment : Fail, post doesn't exist, doesn't owner"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      response_1 = c.get("/recruitment/edit/1", follow=True)
+      response_2 = c.get("/recruitment/edit/100", follow=True)
+      self.assertEqual(response_1.request["PATH_INFO"], "/recruitment/edit/1")
+      self.assertEqual(response_1.status_code, 404)
+      self.assertEqual(response_2.request["PATH_INFO"], "/recruitment/edit/100")
+      self.assertEqual(response_2.status_code, 404)
+      
+   def test_edit_recruitment_case4(self):
+      """test edit recruitment : POST invalid value"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      data = {
+         "heading": "",
+         "content": "",
+         "tags": "T1, T2, T3, T4"
+      }
+      response = c.post("/recruitment/edit/2", data=data, follow=True)
+      message = list(get_messages(response.wsgi_request))
+      self.assertEqual(response.request["PATH_INFO"], "/recruitment/edit/2")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual("T1, T2, T3, T4", response.context["tags"])
+      self.assertNotEqual(response.context["heading"], Post.objects.get(post_id=2).heading)
+      self.assertEqual(len(message), 3)
+
+   def test_edit_result_case1(self):
+      """test edit result : GET"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      heading = Post.objects.get(post_id=16).heading
+      response = c.get("/result/edit/16", follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/result/edit/16")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual(heading, response.context["heading"])
+
+   def test_edit_result_case2(self):
+      """test edit result : POST Successful"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      data = {
+         "heading": "LOL",
+         "content": "ROV",
+         "tags": "T1, T2, T3"
+      }
+      response = c.post("/result/edit/16", data=data, follow=True)
+      self.assertEqual(response.request["PATH_INFO"], "/post/16")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual("LOL", Post.objects.get(post_id=16).heading)
+      self.assertEqual(3, ResultPost.objects.get(post_id=16).tag.all().count())
+
+   def test_edit_result_case3(self):
+      """test edit result : Fail, post doesn't exist, doesn't owner"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      response_1 = c.get("/result/edit/17", follow=True)
+      response_2 = c.get("/result/edit/100", follow=True)
+      self.assertEqual(response_1.request["PATH_INFO"], "/result/edit/17")
+      self.assertEqual(response_1.status_code, 404)
+      self.assertEqual(response_2.request["PATH_INFO"], "/result/edit/100")
+      self.assertEqual(response_2.status_code, 404)
+      
+   def test_edit_result_case4(self):
+      """test edit result : POST invalid value"""
+
+      c = Client()
+      c.login(username="6601349999", password="password123")
+      data = {
+         "heading": "",
+         "content": "",
+         "tags": "T1, T2, T3, T4"
+      }
+      response = c.post("/result/edit/16", data=data, follow=True)
+      message = list(get_messages(response.wsgi_request))
+      self.assertEqual(response.request["PATH_INFO"], "/result/edit/16")
+      self.assertEqual(response.status_code, 200)
+      self.assertEqual("T1, T2, T3, T4", response.context["tags"])
+      self.assertNotEqual(response.context["heading"], Post.objects.get(post_id=16).heading)
+      self.assertEqual(len(message), 3)
