@@ -1,9 +1,27 @@
 {% extends 'base.html' %}
 {% block title %}no chat{% endblock %}
 {% block content %}
+<style>
+    .container-md {
+        display: flex;
+        padding: 10px;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
+    .card {
+        padding: 32px;
+        border-radius: 8px;
+        max-width: 600px;
+    }
+</style>
 <div class="container-md">
-    <h2>You don't have any chat yet.</h2>
-    <h2>Chat will be automatically created once you join/create a team.</h2>
+    <div class="card">
+        <h2>You don't have any chat yet.</h2>
+        <p>Chat will be automatically created once you join/create a team.</p>
+        <p>You can find or create a team in the recruitment tab.</p>
+        <a href="{% url 'recruitment' %}" class="btn btn-primary">Recruitment</a>
+    </div>
 </div>
 
 {% endblock %}
