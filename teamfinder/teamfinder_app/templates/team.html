@@ -43,6 +43,7 @@
                 <div class="card-body">
                     <!-- Team Information -->
                         <div class="team-info">
+                            <p><strong>Team Name: </strong>{{team.recruit_post.heading}}</p>
                             <p style="display: inline-block;"><strong>Post Status:</strong> {% if is_finish %}Finished{% else %}Active{% endif %}</p>
                             <span><a href="{% url 'post' team.recruit_post.post_id%}">Go to Post</a></span>
                             <br><p style="display: inline-block;"><strong>Team Chat:</strong> </p>
