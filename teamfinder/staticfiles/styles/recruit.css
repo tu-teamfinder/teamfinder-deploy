@@ -9,7 +9,7 @@ a{
 }
 
 a:hover{
-    color:#c3002f;
+    color:white;
 }
 
 
@@ -70,6 +70,9 @@ ul{
     margin: 5px 0px 10px 0px;
 }
 
+.blog-box-text a:hover{
+    color:#c3002f;
+}
 
 .blog-box-text p{
     overflow: hidden;
@@ -83,12 +86,13 @@ ul{
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    margin-top: 20px;
+    margin-top: 5px;
 }
 
 .blog-author-text{
     display: flex;
     flex-direction: row;
+    text-transform: capitalize;
 }
 
 .blog-author-text strong{
@@ -147,4 +151,65 @@ ul{
 
 .round-button:hover{
     background-color: #c3002f; /* Darker blue */
+}
+
+.profile-pic {
+    width: 2.5rem; 
+    height: 2.5rem; 
+    object-fit: cover; /* Ensures the image fits nicely within the defined dimensions */
+    border-radius: 50%; 
+}
+
+#tag {
+    border-radius: 9999px;
+    padding-top: 1px;
+    padding-bottom: 1px;
+    color: black;
+}
+
+#search-bar {
+    margin-right: 25%;
+    display: flex;
+    align-items: center;
+    border-radius: 9999px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    background-color: white;
+    height: 36px;
+}
+
+#search-bar input {
+    width: 100%;
+    border: none;
+    outline: none;
+    padding: 5px 10px;
+    flex: 1;
+    font-size: 12px;
+}
+
+#search-bar button {
+    display: flex; /* Flexbox to center content */
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center horizontally */
+    background-color: white;
+    border: none;
+    color: black;
+    padding: 5px 15px;
+    cursor: pointer;
+}
+
+#search-bar button:hover {
+    transform: scale(1.05);
+}
+
+#search-bar button:active {
+    transform: scale(0.95);
+}
+
+#search-bar .tagify {
+    flex: 1;
+    border: none;
+    outline: none;
 }
