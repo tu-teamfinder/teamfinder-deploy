@@ -7,7 +7,7 @@ if project_home not in sys.path:
     sys.path.insert(0, project_home)
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'teamfinder.settings'
-django.setup()
+# django.setup()
 
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
