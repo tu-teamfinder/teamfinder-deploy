@@ -7,6 +7,7 @@ from teamfinder_app.validators import validate_file_size
 from io import BytesIO
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from PIL import Image, UnidentifiedImageError
+from cloudinary.models import CloudinaryField
 
 class CustomUserManager(BaseUserManager):
 
@@ -42,7 +43,7 @@ class User(AbstractUser):
     
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    profile_image = models.ImageField(upload_to='', blank=True, null=True, default="fallback.png", validators=[validate_file_size])
+    profile_image = CloudinaryField('image', folder="images", blank=True, null=True, default="fallback.png", validators=[validate_file_size])
     bio = models.TextField(blank=True, null=True)
 
     def save(self, *args, **kwargs):
