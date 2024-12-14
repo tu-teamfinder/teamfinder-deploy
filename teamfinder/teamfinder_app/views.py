@@ -132,7 +132,7 @@ def myaccount(request):
             form.save()  # Save the updated UserProfile with the new image
             return redirect('/myaccount')  
     else:
-        form = ProfileImageUploadForm(instance=request.user.profile)
+        form = ProfileImageUploadForm()
     
     context = {
         "username": user.username,
