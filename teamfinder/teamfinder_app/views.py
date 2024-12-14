@@ -127,7 +127,7 @@ def myaccount(request):
     feedback = Feedback.objects.filter(receiver=user)
 
     if request.method == 'POST':
-        form = ProfileImageUploadForm(request.POST, request.FILES)
+        form = ProfileImageUploadForm(request.POST, request.FILES, instance=request.user.profile)
         if form.is_valid():
             form.save()  # Save the updated UserProfile with the new image
             return redirect('/myaccount')  
