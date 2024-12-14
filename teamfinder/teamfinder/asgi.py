@@ -5,7 +5,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from channels.security.websocket import AllowedHostsOriginValidator
 from channels.auth import AuthMiddlewareStack
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'a_core.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'teamfinder.settings')
 
 django_asgi_app = get_asgi_application()
 
