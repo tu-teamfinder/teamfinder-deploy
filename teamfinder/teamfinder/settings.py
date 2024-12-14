@@ -18,7 +18,7 @@ env = Env()
 Env.read_env()
 
 ENVIRONMENT = env('ENVIRONMENT', default="production")
-ENVIRONMENT = "development"
+# ENVIRONMENT = "production"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,9 +33,14 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'teamfinder-x0ph.onrender.com']
 
-CSRF_TRUSTED_ORIGINS = [ 'https://*' ]
+CSRF_TRUSTED_ORIGINS = [ 'https://teamfinder-x0ph.onrender.com' ]
+
+INTERNAL_IPS = (
+    '127.0.0.1',
+    'localhost:8000'
+)
 
 # Application definition
 
